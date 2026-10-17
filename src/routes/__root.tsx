@@ -8,7 +8,10 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Menu } from "lucide-react";
+import { AppSidebar } from "../components/AppSidebar";
+import { cn } from "../lib/utils";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -78,20 +81,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Visão Ótica — Gestão para óticas" },
+      { name: "description", content: "Sistema de gestão para óticas: clientes, O.S., vendas, financeiro e estoque." },
+      { property: "og:title", content: "Visão Ótica — Gestão para óticas" },
+      { property: "og:description", content: "Sistema de gestão para óticas: clientes, O.S., vendas, financeiro e estoque." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
-    ],
+          ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
@@ -103,7 +106,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
@@ -121,7 +124,26 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <AppLayout />
     </QueryClientProvider>
+  );
+}
+
+function AppLayout() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <aside className={cn("fixed inset-y-0 left-0 z-40 w-64 transition-transform lg:translate-x-0", mobileOpen ? "translate-x-0" : "-translate-x-full")}>
+        <AppSidebar onNav={() => setMobileOpen(false)} />
+      </aside>
+      {mobileOpen && <button aria-label="Fechar menu" className="fixed inset-0 z-30 bg-foreground/40 lg:hidden" onClick={() => setMobileOpen(false)} />}
+      <div className="lg:pl-64">
+        <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b bg-card px-4 lg:hidden">
+          <button aria-label="Abrir menu" onClick={() => setMobileOpen(true)}><Menu className="h-5 w-5" /></button>
+          <span className="font-bold">Visão Ótica</span>
+        </header>
+        <main className="mx-auto max-w-7xl p-4 md:p-8"><Outlet /></main>
+      </div>
+    </div>
   );
 }
