@@ -173,3 +173,7 @@
   .print-area { position: absolute; inset: 0; padding: 0; background: #fff; color: #000; }
   .no-print { display: none !important; }
 }
+
+#lovable-badge {
+  display: none !important;
+}
