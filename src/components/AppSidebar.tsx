@@ -13,14 +13,17 @@ function Item({ to, active, children, onNav }: { to: string; active: boolean; ch
   if (to === "otica-zap") return <Link to="/otica-zap" className={cls} onClick={onNav}>{children}</Link>;
   if (to === "clientes") return <Link to="/clientes" className={cls} onClick={onNav}>{children}</Link>;
   if (to === "produtos") return <Link to="/produtos" className={cls} onClick={onNav}>{children}</Link>;
+  if (LENTES.includes(to)) return <Link to="/lentes/$tipo" params={{ tipo: to }} className={cls} onClick={onNav}>{children}</Link>;
   return <Link to="/modulo/$slug" params={{ slug: to }} className={cls} onClick={onNav}>{children}</Link>;
 }
+
+const LENTES = ["lentes-monofocais", "lentes-multifocais", "lentes-de-contato", "tratamentos"];
 
 export function AppSidebar({ onNav }: { onNav: () => void }) {
   const { pathname } = useLocation();
   const [open, setOpen] = useState<string | null>(null);
   const isActive = (slug: string) =>
-    slug === "" ? pathname === "/" : ["otica-zap", "clientes", "produtos"].includes(slug) ? pathname === `/${slug}` : pathname === `/modulo/${slug}`;
+    slug === "" ? pathname === "/" : ["otica-zap", "clientes", "produtos"].includes(slug) ? pathname === `/${slug}` : LENTES.includes(slug) ? pathname === `/lentes/${slug}` : pathname === `/modulo/${slug}`;
 
   return (
     <nav className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
