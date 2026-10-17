@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as OticaZapRouteImport } from './routes/otica-zap'
+import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as ModuloSlugRouteImport } from './routes/modulo.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const OticaZapRoute = OticaZapRouteImport.update({
   path: '/otica-zap',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProdutosRoute = ProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ModuloSlugRoute = ModuloSlugRouteImport.update({
   id: '/modulo/$slug',
   path: '/modulo/$slug',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/clientes': typeof ClientesRoute
   '/otica-zap': typeof OticaZapRoute
+  '/produtos': typeof ProdutosRoute
   '/modulo/$slug': typeof ModuloSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/clientes': typeof ClientesRoute
   '/otica-zap': typeof OticaZapRoute
+  '/produtos': typeof ProdutosRoute
   '/modulo/$slug': typeof ModuloSlugRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,28 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/clientes': typeof ClientesRoute
   '/otica-zap': typeof OticaZapRoute
+  '/produtos': typeof ProdutosRoute
   '/modulo/$slug': typeof ModuloSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/clientes' | '/otica-zap' | '/modulo/$slug'
+  fullPaths: '/' | '/clientes' | '/otica-zap' | '/produtos' | '/modulo/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/clientes' | '/otica-zap' | '/modulo/$slug'
-  id: '__root__' | '/' | '/clientes' | '/otica-zap' | '/modulo/$slug'
+  to: '/' | '/clientes' | '/otica-zap' | '/produtos' | '/modulo/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/clientes'
+    | '/otica-zap'
+    | '/produtos'
+    | '/modulo/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ClientesRoute: typeof ClientesRoute
   OticaZapRoute: typeof OticaZapRoute
+  ProdutosRoute: typeof ProdutosRoute
   ModuloSlugRoute: typeof ModuloSlugRoute
 }
 
@@ -92,6 +108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OticaZapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/produtos': {
+      id: '/produtos'
+      path: '/produtos'
+      fullPath: '/produtos'
+      preLoaderRoute: typeof ProdutosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/modulo/$slug': {
       id: '/modulo/$slug'
       path: '/modulo/$slug'
@@ -106,6 +129,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ClientesRoute: ClientesRoute,
   OticaZapRoute: OticaZapRoute,
+  ProdutosRoute: ProdutosRoute,
   ModuloSlugRoute: ModuloSlugRoute,
 }
 export const routeTree = rootRouteImport
