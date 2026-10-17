@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/lib/auth";
 import { canAccess, roleLabel, slugFromPath } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/otica-louise.jpg.asset.json";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -34,7 +35,7 @@ function AppLayout() {
       <div className="lg:pl-64">
         <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b bg-card px-4 lg:hidden">
           <button aria-label="Abrir menu" onClick={() => setMobileOpen(true)}><Menu className="h-5 w-5" /></button>
-          <span className="font-bold">Ótica Louise</span>
+          <img src={logo.url} alt="Logo Ótica Louise" className="h-8 w-8 rounded-full object-cover" /><span className="font-bold">Ótica Louise</span>
         </header>
         <main className="mx-auto max-w-7xl p-4 md:p-8">
           {allowed ? <Outlet /> : (
