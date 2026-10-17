@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { canAccess, roleLabel } from "@/lib/permissions";
 import { supabase } from "@/integrations/supabase/client";
+import { InstallApp } from "@/components/InstallApp";
 import logo from "@/assets/otica-louise.jpg.asset.json";
 
 const LENTES = ["lentes-monofocais", "lentes-multifocais", "lentes-de-contato", "tratamentos"];
@@ -79,6 +80,7 @@ export function AppSidebar({ onNav }: { onNav: () => void }) {
           );
         })}
       </ul>
+      <InstallApp />
       <div className="flex items-center gap-3 border-t border-sidebar-border p-4">
         <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sidebar-accent text-sm font-bold">{(nome || "?").charAt(0).toUpperCase()}</div>
         <div className="min-w-0 flex-1"><div className="truncate text-sm font-medium">{nome}</div><div className="text-xs opacity-60">{roleLabel(role)}</div></div>
