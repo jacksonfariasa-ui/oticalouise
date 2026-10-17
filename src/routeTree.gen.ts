@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as OticaZapRouteImport } from './routes/otica-zap'
 import { Route as ProdutosRouteImport } from './routes/produtos'
+import { Route as PromocoesRouteImport } from './routes/promocoes'
 import { Route as LentesTipoRouteImport } from './routes/lentes.$tipo'
 import { Route as ModuloSlugRouteImport } from './routes/modulo.$slug'
 
@@ -36,6 +37,11 @@ const ProdutosRoute = ProdutosRouteImport.update({
   path: '/produtos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PromocoesRoute = PromocoesRouteImport.update({
+  id: '/promocoes',
+  path: '/promocoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LentesTipoRoute = LentesTipoRouteImport.update({
   id: '/lentes/$tipo',
   path: '/lentes/$tipo',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/clientes': typeof ClientesRoute
   '/otica-zap': typeof OticaZapRoute
   '/produtos': typeof ProdutosRoute
+  '/promocoes': typeof PromocoesRoute
   '/lentes/$tipo': typeof LentesTipoRoute
   '/modulo/$slug': typeof ModuloSlugRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/clientes': typeof ClientesRoute
   '/otica-zap': typeof OticaZapRoute
   '/produtos': typeof ProdutosRoute
+  '/promocoes': typeof PromocoesRoute
   '/lentes/$tipo': typeof LentesTipoRoute
   '/modulo/$slug': typeof ModuloSlugRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/clientes': typeof ClientesRoute
   '/otica-zap': typeof OticaZapRoute
   '/produtos': typeof ProdutosRoute
+  '/promocoes': typeof PromocoesRoute
   '/lentes/$tipo': typeof LentesTipoRoute
   '/modulo/$slug': typeof ModuloSlugRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/otica-zap'
     | '/produtos'
+    | '/promocoes'
     | '/lentes/$tipo'
     | '/modulo/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/otica-zap'
     | '/produtos'
+    | '/promocoes'
     | '/lentes/$tipo'
     | '/modulo/$slug'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/otica-zap'
     | '/produtos'
+    | '/promocoes'
     | '/lentes/$tipo'
     | '/modulo/$slug'
   fileRoutesById: FileRoutesById
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   ClientesRoute: typeof ClientesRoute
   OticaZapRoute: typeof OticaZapRoute
   ProdutosRoute: typeof ProdutosRoute
+  PromocoesRoute: typeof PromocoesRoute
   LentesTipoRoute: typeof LentesTipoRoute
   ModuloSlugRoute: typeof ModuloSlugRoute
 }
@@ -138,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProdutosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/promocoes': {
+      id: '/promocoes'
+      path: '/promocoes'
+      fullPath: '/promocoes'
+      preLoaderRoute: typeof PromocoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lentes/$tipo': {
       id: '/lentes/$tipo'
       path: '/lentes/$tipo'
@@ -160,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientesRoute: ClientesRoute,
   OticaZapRoute: OticaZapRoute,
   ProdutosRoute: ProdutosRoute,
+  PromocoesRoute: PromocoesRoute,
   LentesTipoRoute: LentesTipoRoute,
   ModuloSlugRoute: ModuloSlugRoute,
 }
