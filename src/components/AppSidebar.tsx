@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, Eye, LogOut } from "lucide-react";
+import { ChevronDown, LogOut } from "lucide-react";
 import { NAV } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { canAccess, roleLabel } from "@/lib/permissions";
 import { supabase } from "@/integrations/supabase/client";
+import logo from "@/assets/otica-louise.jpg.asset.json";
 
 const LENTES = ["lentes-monofocais", "lentes-multifocais", "lentes-de-contato", "tratamentos"];
 
@@ -50,8 +51,8 @@ export function AppSidebar({ onNav }: { onNav: () => void }) {
   return (
     <nav className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-2 border-b border-sidebar-border px-5 py-5">
-        <div className="grid h-9 w-9 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"><Eye className="h-5 w-5" /></div>
-        <div><div className="font-bold leading-tight">Visão Ótica</div><div className="text-xs opacity-60">Gestão para óticas</div></div>
+        <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full ring-2 ring-sidebar-border"><img src={logo.url} alt="Logo Ótica Louise" className="h-full w-full rounded-full object-cover" /></div>
+        <div className="min-w-0"><div className="truncate font-bold leading-tight">Ótica Louise</div><div className="text-xs opacity-60">Gestão para óticas</div></div>
       </div>
       <ul className="flex-1 space-y-0.5 overflow-y-auto p-3">
         {items.map((n) => {

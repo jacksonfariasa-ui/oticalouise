@@ -11,9 +11,9 @@ import { useAuth } from "@/lib/auth";
 export const Route = createFileRoute("/_authenticated/usuarios")({
   head: () => ({
     meta: [
-      { title: "Usuários e permissões — Visão Ótica" },
+      { title: "Usuários e permissões — Ótica Louise" },
       { name: "description", content: "Cadastre a equipe, defina perfis de acesso e gerencie senhas." },
-      { property: "og:title", content: "Usuários e permissões — Visão Ótica" },
+      { property: "og:title", content: "Usuários e permissões — Ótica Louise" },
       { property: "og:description", content: "Cadastre a equipe, defina perfis de acesso e gerencie senhas." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

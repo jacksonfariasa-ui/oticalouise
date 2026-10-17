@@ -16,7 +16,7 @@ const TIPOS: Record<string, string> = {
 
 export const Route = createFileRoute("/_authenticated/lentes/$tipo")({
   head: ({ params }) => {
-    const t = `${TIPOS[params.tipo] ?? "Tabelas de Lentes"} — Visão Ótica`;
+    const t = `${TIPOS[params.tipo] ?? "Tabelas de Lentes"} — Ótica Louise`;
     const d = "Tabela de preços de lentes com importação de planilhas e documentos.";
     return { meta: [{ title: t }, { name: "description", content: d }, { property: "og:title", content: t }, { property: "og:description", content: d }] };
   },

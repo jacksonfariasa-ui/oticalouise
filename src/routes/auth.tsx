@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Eye, Lock, Mail, User } from "lucide-react";
+import { Lock, Mail, User } from "lucide-react";
+import logo from "@/assets/otica-louise.jpg.asset.json";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { ROLES } from "@/lib/permissions";
@@ -8,10 +9,10 @@ import { ROLES } from "@/lib/permissions";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar — Visão Ótica" },
-      { name: "description", content: "Acesse o sistema de gestão da Visão Ótica com seu e-mail e senha." },
-      { property: "og:title", content: "Entrar — Visão Ótica" },
-      { property: "og:description", content: "Acesse o sistema de gestão da Visão Ótica com seu e-mail e senha." },
+      { title: "Entrar — Ótica Louise" },
+      { name: "description", content: "Acesse o sistema de gestão da Ótica Louise com seu e-mail e senha." },
+      { property: "og:title", content: "Entrar — Ótica Louise" },
+      { property: "og:description", content: "Acesse o sistema de gestão da Ótica Louise com seu e-mail e senha." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -73,8 +74,8 @@ function AuthPage() {
     <div className="grid min-h-screen bg-background lg:grid-cols-2">
       <div className="hidden flex-col justify-between bg-sidebar p-12 text-sidebar-foreground lg:flex">
         <div className="flex items-center gap-2">
-          <div className="grid h-10 w-10 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"><Eye className="h-5 w-5" /></div>
-          <span className="text-lg font-bold">Visão Ótica</span>
+          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full ring-2 ring-sidebar-border"><img src={logo.url} alt="Logo Ótica Louise" className="h-full w-full rounded-full object-cover" /></div>
+          <span className="text-lg font-bold">Ótica Louise</span>
         </div>
         <div>
           <h2 className="text-3xl font-bold leading-tight">Cada pessoa da equipe vê só o que precisa.</h2>
@@ -93,8 +94,8 @@ function AuthPage() {
       <div className="flex items-center justify-center p-6">
         <form onSubmit={submit} className="w-full max-w-sm space-y-4">
           <div className="mb-6 flex items-center gap-2 lg:hidden">
-            <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground"><Eye className="h-5 w-5" /></div>
-            <span className="font-bold">Visão Ótica</span>
+            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full"><img src={logo.url} alt="Logo Ótica Louise" className="h-full w-full rounded-full object-cover" /></div>
+            <span className="font-bold">Ótica Louise</span>
           </div>
           <div>
             <h1 className="text-2xl font-bold">{mode === "entrar" ? "Entrar no sistema" : mode === "criar" ? "Criar conta" : "Recuperar senha"}</h1>

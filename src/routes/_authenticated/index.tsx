@@ -12,9 +12,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
-      { title: "Painel de Informações — Visão Ótica" },
+      { title: "Painel de Informações — Ótica Louise" },
       { name: "description", content: "Painel gerencial da ótica: faturamento, contas, pós-vendas, O.S. e estoque." },
-      { property: "og:title", content: "Painel de Informações — Visão Ótica" },
+      { property: "og:title", content: "Painel de Informações — Ótica Louise" },
       { property: "og:description", content: "Painel gerencial da ótica: faturamento, contas, pós-vendas, O.S. e estoque." },
     ],
   }),

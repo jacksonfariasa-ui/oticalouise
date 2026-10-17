@@ -9,9 +9,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 export const Route = createFileRoute("/_authenticated/produtos")({
   head: () => ({
     meta: [
-      { title: "Produtos — Visão Ótica" },
+      { title: "Produtos — Ótica Louise" },
       { name: "description", content: "Cadastro de armações, lentes e acessórios da ótica." },
-      { property: "og:title", content: "Produtos — Visão Ótica" },
+      { property: "og:title", content: "Produtos — Ótica Louise" },
       { property: "og:description", content: "Cadastro de armações, lentes e acessórios da ótica." },
     ],
   }),

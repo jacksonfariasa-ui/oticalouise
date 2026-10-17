@@ -9,9 +9,9 @@ import { Badge } from "@/components/ui/badge";
 export const Route = createFileRoute("/_authenticated/otica-zap")({
   head: () => ({
     meta: [
-      { title: "Ótica Zap — Visão Ótica" },
+      { title: "Ótica Zap — Ótica Louise" },
       { name: "description", content: "Envio e acompanhamento de mensagens de WhatsApp para clientes da ótica." },
-      { property: "og:title", content: "Ótica Zap — Visão Ótica" },
+      { property: "og:title", content: "Ótica Zap — Ótica Louise" },
       { property: "og:description", content: "Envio e acompanhamento de mensagens de WhatsApp para clientes da ótica." },
     ],
   }),
