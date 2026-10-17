@@ -8,10 +8,8 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
-import { Menu } from "lucide-react";
-import { AppSidebar } from "../components/AppSidebar";
-import { cn } from "../lib/utils";
+import { useEffect, type ReactNode } from "react";
+import { AuthProvider } from "../lib/auth";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -123,27 +121,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <AppLayout />
+      <AuthProvider>
+        <Outlet />
+      </AuthProvider>
     </QueryClientProvider>
-  );
-}
-
-function AppLayout() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <aside className={cn("fixed inset-y-0 left-0 z-40 w-64 transition-transform lg:translate-x-0", mobileOpen ? "translate-x-0" : "-translate-x-full")}>
-        <AppSidebar onNav={() => setMobileOpen(false)} />
-      </aside>
-      {mobileOpen && <button aria-label="Fechar menu" className="fixed inset-0 z-30 bg-foreground/40 lg:hidden" onClick={() => setMobileOpen(false)} />}
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b bg-card px-4 lg:hidden">
-          <button aria-label="Abrir menu" onClick={() => setMobileOpen(true)}><Menu className="h-5 w-5" /></button>
-          <span className="font-bold">Visão Ótica</span>
-        </header>
-        <main className="mx-auto max-w-7xl p-4 md:p-8"><Outlet /></main>
-      </div>
-    </div>
   );
 }

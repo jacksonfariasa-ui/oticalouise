@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { findLabel } from "@/lib/nav";
 import { MODULES, type Mod } from "@/lib/modules";
 
-export const Route = createFileRoute("/modulo/$slug")({
+export const Route = createFileRoute("/_authenticated/modulo/$slug")({
   head: ({ params }) => {
     const t = `${findLabel(params.slug)} — Visão Ótica`;
     const d = MODULES[params.slug]?.desc ?? `Módulo ${findLabel(params.slug)} do sistema de gestão para óticas.`;

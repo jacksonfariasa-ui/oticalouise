@@ -14,7 +14,7 @@ const TIPOS: Record<string, string> = {
   tratamentos: "Tratamentos",
 };
 
-export const Route = createFileRoute("/lentes/$tipo")({
+export const Route = createFileRoute("/_authenticated/lentes/$tipo")({
   head: ({ params }) => {
     const t = `${TIPOS[params.tipo] ?? "Tabelas de Lentes"} — Visão Ótica`;
     const d = "Tabela de preços de lentes com importação de planilhas e documentos.";
