@@ -49,7 +49,7 @@ function AuthPage() {
       return setMsg({ t: "ok", m: "Se o e-mail estiver cadastrado, você receberá um link para criar uma nova senha." });
     }
     const p = schema.safeParse({ email, senha });
-    if (!p.success) return setMsg({ t: "erro", m: p.error.issues[0].message });
+    if (!p.success) return setMsg({ t: "erro", m: p.error.issues[0]?.message ?? "Dados inválidos" });
     setBusy(true);
     if (mode === "entrar") {
       const { error } = await supabase.auth.signInWithPassword({ email: p.data.email, password: p.data.senha });

@@ -36,5 +36,5 @@ export function slugFromPath(pathname: string): string {
   if (pathname === "/" || pathname === "") return "";
   if (pathname.startsWith("/usuarios")) return "administracao";
   const parts = pathname.split("/").filter(Boolean);
-  return parts[parts.length - 1];
+  return parts[parts.length - 1] ?? "";
 }
