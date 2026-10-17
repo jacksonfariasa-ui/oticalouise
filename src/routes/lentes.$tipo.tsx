@@ -90,7 +90,7 @@ function Lentes() {
     try {
       const rows = (await readTableFile(file)).filter((r) => r.some((c) => c?.trim()));
       if (rows.length < 2) throw new Error("O arquivo precisa ter uma linha de títulos e pelo menos uma linha de dados.");
-      const mapa = rows[0].map((h) => COLUNAS.find((c) => c.alias.some((a) => norm(h).includes(a)))?.k ?? ("" as const));
+      const mapa = (rows[0] ?? []).map((h) => COLUNAS.find((c) => c.alias.some((a) => norm(h).includes(a)))?.k ?? ("" as const));
       setImp({ arquivo: file.name, linhas: rows, mapa });
     } catch (e) {
       setErro(e instanceof Error ? e.message : "Não foi possível ler o arquivo.");
@@ -222,7 +222,7 @@ function Lentes() {
               <div className="max-h-80 overflow-auto rounded-md border">
                 <table className="w-full text-xs">
                   <thead className="sticky top-0 bg-muted">
-                    <tr>{imp.linhas[0].map((h, i) => (
+                    <tr>{(imp.linhas[0] ?? []).map((h, i) => (
                       <th key={i} className="p-2 text-left align-top">
                         <div className="mb-1 font-semibold">{h || `Coluna ${i + 1}`}</div>
                         <select aria-label={`Campo para ${h}`} className="h-8 w-full rounded border border-input bg-background px-1 text-xs font-normal" value={imp.mapa[i]}
@@ -233,7 +233,7 @@ function Lentes() {
                       </th>
                     ))}</tr>
                   </thead>
-                  <tbody>{imp.linhas.slice(1, 9).map((r, i) => <tr key={i} className="border-t">{imp.linhas[0].map((_, j) => <td key={j} className="p-2">{r[j]}</td>)}</tr>)}</tbody>
+                  <tbody>{imp.linhas.slice(1, 9).map((r, i) => <tr key={i} className="border-t">{(imp.linhas[0] ?? []).map((_, j) => <td key={j} className="p-2">{r[j]}</td>)}</tr>)}</tbody>
                 </table>
               </div>
               {!imp.mapa.includes("nome") && <p className="text-sm text-destructive">Escolha qual coluna contém o nome da lente.</p>}
