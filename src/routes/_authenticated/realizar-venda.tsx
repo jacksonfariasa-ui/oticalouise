@@ -58,12 +58,12 @@ const fmtData = (d: string) => (d ? new Date(d + "T12:00:00").toLocaleDateString
 const sel = "w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring";
 
 const EXEMPLOS: Documento[] = [
-  { numero: "PED-1042", tipo: "Pedido", data: "2026-10-15", validade: "", cliente: CLIENTES[0], vendedor: "Equipe Louise",
+  { numero: "PED-1042", tipo: "Pedido", data: "2026-10-15", validade: "", cliente: CLIENTES[0]!, vendedor: "Equipe Louise",
     itens: [{ id: "x1", codigo: "ARM-001", descricao: "Armação Ray-Ban RX5154", preco: 689.9, qtd: 1 }, { id: "x2", codigo: "LM-002", descricao: "Lente monofocal 1.67 Blue Cut (par)", preco: 590, qtd: 1 }],
     desconto: { tipo: "percentual", valor: 5 }, pagamento: "Cartão de crédito", parcelas: 4, entrada: 0,
     receita: { od: { esf: "-1.75", cil: "-0.50", eixo: "180", adicao: "", dnp: "31" }, oe: { esf: "-2.00", cil: "-0.25", eixo: "175", adicao: "", dnp: "32" } },
     entrega: "2026-10-22", obs: "Cliente prefere retirar à tarde." },
-  { numero: "ORC-0318", tipo: "Orçamento", data: "2026-10-16", validade: "2026-10-26", cliente: CLIENTES[2], vendedor: "Equipe Louise",
+  { numero: "ORC-0318", tipo: "Orçamento", data: "2026-10-16", validade: "2026-10-26", cliente: CLIENTES[2]!, vendedor: "Equipe Louise",
     itens: [{ id: "y1", codigo: "LMF-001", descricao: "Lente multifocal Varilux Comfort (par)", preco: 1890, qtd: 1 }, { id: "y2", codigo: "TR-001", descricao: "Tratamento fotossensível", preco: 280, qtd: 1 }],
     desconto: { tipo: "valor", valor: 150 }, pagamento: "PIX", parcelas: 1, entrada: 0,
     receita: { od: { esf: "+1.25", cil: "", eixo: "", adicao: "+2.00", dnp: "30" }, oe: { esf: "+1.50", cil: "-0.25", eixo: "90", adicao: "+2.00", dnp: "30" } },
