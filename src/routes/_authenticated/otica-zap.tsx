@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-export const Route = createFileRoute("/otica-zap")({
+export const Route = createFileRoute("/_authenticated/otica-zap")({
   head: () => ({
     meta: [
       { title: "Ótica Zap — Visão Ótica" },
