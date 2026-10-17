@@ -9,74 +9,107 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedOticaZapRouteImport } from './routes/_authenticated/otica-zap'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
 import { Route as AuthenticatedPromocoesRouteImport } from './routes/_authenticated/promocoes'
+import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
 import { Route as AuthenticatedLentesTipoRouteImport } from './routes/_authenticated/lentes.$tipo'
 import { Route as AuthenticatedModuloSlugRouteImport } from './routes/_authenticated/modulo.$slug'
 
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/_authenticated/',
-  path: '/',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
-  id: '/_authenticated/clientes',
+  id: '/clientes',
   path: '/clientes',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedOticaZapRoute = AuthenticatedOticaZapRouteImport.update({
-  id: '/_authenticated/otica-zap',
+  id: '/otica-zap',
   path: '/otica-zap',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProdutosRoute = AuthenticatedProdutosRouteImport.update({
-  id: '/_authenticated/produtos',
+  id: '/produtos',
   path: '/produtos',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPromocoesRoute = AuthenticatedPromocoesRouteImport.update({
-  id: '/_authenticated/promocoes',
+  id: '/promocoes',
   path: '/promocoes',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedUsuariosRoute = AuthenticatedUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLentesTipoRoute = AuthenticatedLentesTipoRouteImport.update({
-  id: '/_authenticated/lentes/$tipo',
+  id: '/lentes/$tipo',
   path: '/lentes/$tipo',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedModuloSlugRoute = AuthenticatedModuloSlugRouteImport.update({
-  id: '/_authenticated/modulo/$slug',
+  id: '/modulo/$slug',
   path: '/modulo/$slug',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof AuthenticatedIndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/otica-zap': typeof AuthenticatedOticaZapRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/promocoes': typeof AuthenticatedPromocoesRoute
-  '/': typeof AuthenticatedIndexRoute
+  '/usuarios': typeof AuthenticatedUsuariosRoute
   '/lentes/$tipo': typeof AuthenticatedLentesTipoRoute
   '/modulo/$slug': typeof AuthenticatedModuloSlugRoute
 }
 export interface FileRoutesByTo {
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/otica-zap': typeof AuthenticatedOticaZapRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/promocoes': typeof AuthenticatedPromocoesRoute
+  '/usuarios': typeof AuthenticatedUsuariosRoute
   '/': typeof AuthenticatedIndexRoute
   '/lentes/$tipo': typeof AuthenticatedLentesTipoRoute
   '/modulo/$slug': typeof AuthenticatedModuloSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/otica-zap': typeof AuthenticatedOticaZapRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/promocoes': typeof AuthenticatedPromocoesRoute
+  '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/lentes/$tipo': typeof AuthenticatedLentesTipoRoute
   '/_authenticated/modulo/$slug': typeof AuthenticatedModuloSlugRoute
@@ -84,105 +117,160 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
     | '/clientes'
     | '/otica-zap'
     | '/produtos'
     | '/promocoes'
-    | '/'
+    | '/usuarios'
     | '/lentes/$tipo'
     | '/modulo/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/auth'
+    | '/reset-password'
     | '/clientes'
     | '/otica-zap'
     | '/produtos'
     | '/promocoes'
+    | '/usuarios'
     | '/'
     | '/lentes/$tipo'
     | '/modulo/$slug'
   id:
     | '__root__'
+    | '/_authenticated'
+    | '/auth'
+    | '/reset-password'
     | '/_authenticated/clientes'
     | '/_authenticated/otica-zap'
     | '/_authenticated/produtos'
     | '/_authenticated/promocoes'
+    | '/_authenticated/usuarios'
     | '/_authenticated/'
     | '/_authenticated/lentes/$tipo'
     | '/_authenticated/modulo/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
-  AuthenticatedOticaZapRoute: typeof AuthenticatedOticaZapRoute
-  AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
-  AuthenticatedPromocoesRoute: typeof AuthenticatedPromocoesRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedLentesTipoRoute: typeof AuthenticatedLentesTipoRoute
-  AuthenticatedModuloSlugRoute: typeof AuthenticatedModuloSlugRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/': {
       id: '/_authenticated/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/clientes': {
       id: '/_authenticated/clientes'
       path: '/clientes'
       fullPath: '/clientes'
       preLoaderRoute: typeof AuthenticatedClientesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/otica-zap': {
       id: '/_authenticated/otica-zap'
       path: '/otica-zap'
       fullPath: '/otica-zap'
       preLoaderRoute: typeof AuthenticatedOticaZapRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/produtos': {
       id: '/_authenticated/produtos'
       path: '/produtos'
       fullPath: '/produtos'
       preLoaderRoute: typeof AuthenticatedProdutosRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/promocoes': {
       id: '/_authenticated/promocoes'
       path: '/promocoes'
       fullPath: '/promocoes'
       preLoaderRoute: typeof AuthenticatedPromocoesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/usuarios': {
+      id: '/_authenticated/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof AuthenticatedUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/lentes/$tipo': {
       id: '/_authenticated/lentes/$tipo'
       path: '/lentes/$tipo'
       fullPath: '/lentes/$tipo'
       preLoaderRoute: typeof AuthenticatedLentesTipoRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/modulo/$slug': {
       id: '/_authenticated/modulo/$slug'
       path: '/modulo/$slug'
       fullPath: '/modulo/$slug'
       preLoaderRoute: typeof AuthenticatedModuloSlugRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
+  AuthenticatedOticaZapRoute: typeof AuthenticatedOticaZapRoute
+  AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
+  AuthenticatedPromocoesRoute: typeof AuthenticatedPromocoesRoute
+  AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedLentesTipoRoute: typeof AuthenticatedLentesTipoRoute
+  AuthenticatedModuloSlugRoute: typeof AuthenticatedModuloSlugRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedOticaZapRoute: AuthenticatedOticaZapRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedPromocoesRoute: AuthenticatedPromocoesRoute,
+  AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedLentesTipoRoute: AuthenticatedLentesTipoRoute,
   AuthenticatedModuloSlugRoute: AuthenticatedModuloSlugRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
