@@ -31,7 +31,7 @@ const INICIAIS: Produto[] = [
 ];
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const VAZIO = { codigo: "", nome: "", categoria: CATEGORIAS[0], marca: "", preco: "", estoque: "", minimo: "" };
+const VAZIO = { codigo: "", nome: "", categoria: "Armação", marca: "", preco: "", estoque: "", minimo: "" };
 
 function Produtos() {
   const [lista, setLista] = useState<Produto[]>(INICIAIS);
