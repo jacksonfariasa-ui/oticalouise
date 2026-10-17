@@ -51,7 +51,7 @@ export function AppSidebar({ onNav }: { onNav: () => void }) {
     <nav className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-2 border-b border-sidebar-border px-5 py-5">
         <div className="grid h-9 w-9 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"><Eye className="h-5 w-5" /></div>
-        <div><div className="font-bold leading-tight">Visão Ótica</div><div className="text-xs opacity-60">Gestão para óticas</div></div>
+        <div><div className="font-bold leading-tight">Ótica Louise</div><div className="text-xs opacity-60">Gestão para óticas</div></div>
       </div>
       <ul className="flex-1 space-y-0.5 overflow-y-auto p-3">
         {items.map((n) => {

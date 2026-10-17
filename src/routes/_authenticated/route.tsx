@@ -34,7 +34,7 @@ function AppLayout() {
       <div className="lg:pl-64">
         <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b bg-card px-4 lg:hidden">
           <button aria-label="Abrir menu" onClick={() => setMobileOpen(true)}><Menu className="h-5 w-5" /></button>
-          <span className="font-bold">Visão Ótica</span>
+          <span className="font-bold">Ótica Louise</span>
         </header>
         <main className="mx-auto max-w-7xl p-4 md:p-8">
           {allowed ? <Outlet /> : (

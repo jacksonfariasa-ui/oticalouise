@@ -55,7 +55,7 @@ export const MODULES: Record<string, Mod> = {
   "certificado-digital": {
     desc: "Certificados para emissão de notas fiscais", status: "status",
     campos: [["tipo", "Tipo", ["A1", "A3"]], ["titular", "Titular", "t"], ["validade", "Validade", "d"], ["status", "Status", ["Válido", "Vence em breve", "Vencido"]]],
-    linhas: [["A1", "Visão Ótica LTDA", "2027-03-12", "Válido"], ["A3", "Filial Centro", "2026-11-02", "Vence em breve"]],
+    linhas: [["A1", "Ótica Louise LTDA", "2027-03-12", "Válido"], ["A3", "Filial Centro", "2026-11-02", "Vence em breve"]],
   },
   "plug-chat": {
     desc: "Conversas recebidas pelo chat do site", status: "status",

@@ -10,7 +10,7 @@ import { MODULES, type Mod } from "@/lib/modules";
 
 export const Route = createFileRoute("/_authenticated/modulo/$slug")({
   head: ({ params }) => {
-    const t = `${findLabel(params.slug)} — Visão Ótica`;
+    const t = `${findLabel(params.slug)} — Ótica Louise`;
     const d = MODULES[params.slug]?.desc ?? `Módulo ${findLabel(params.slug)} do sistema de gestão para óticas.`;
     return { meta: [{ title: t }, { name: "description", content: d }, { property: "og:title", content: t }, { property: "og:description", content: d }] };
   },

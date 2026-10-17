@@ -5,10 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Nova senha — Visão Ótica" },
-      { name: "description", content: "Crie uma nova senha para acessar a Visão Ótica." },
-      { property: "og:title", content: "Nova senha — Visão Ótica" },
-      { property: "og:description", content: "Crie uma nova senha para acessar a Visão Ótica." },
+      { title: "Nova senha — Ótica Louise" },
+      { name: "description", content: "Crie uma nova senha para acessar a Ótica Louise." },
+      { property: "og:title", content: "Nova senha — Ótica Louise" },
+      { property: "og:description", content: "Crie uma nova senha para acessar a Ótica Louise." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
