@@ -101,7 +101,7 @@ function Lentes() {
   function confirmarImportacao() {
     if (!imp) return;
     const novos = imp.linhas.slice(1).map((r) => {
-      const o: Record<string, string> = { ...VAZIO };
+      const o: Record<Campo, string> = { ...VAZIO };
       imp.mapa.forEach((k, i) => { if (k) o[k] = r[i] ?? ""; });
       return { id: seq++, tipo, fornecedor: o.fornecedor, nome: o.nome, material: o.material, indice: o.indice, faixa: o.faixa, custo: num(o.custo), preco: num(o.preco) };
     }).filter((l) => l.nome);
