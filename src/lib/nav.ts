@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Users, Package, Glasses, Tag, FileText, Wrench, ShoppingCart, ClipboardList,
-  ListChecks, Sparkles, TrendingUp, Megaphone, BarChart3, Wallet, Boxes, Building2, FolderPlus, Settings,
+  ListChecks, ShoppingBag, Sparkles, TrendingUp, Megaphone, BarChart3, Wallet, Boxes, Building2, FolderPlus, Settings,
   type LucideIcon,
 } from "lucide-react";
 
@@ -12,6 +12,7 @@ const kids = (...l: string[]) => l.map((label) => ({ label, slug: s(label) }));
 
 export const NAV: NavItem[] = [
   { label: "Painel de Informações", slug: "", icon: LayoutDashboard },
+  { label: "Realizar Venda", slug: "realizar-venda", icon: ShoppingBag },
   { label: "Clientes", slug: "clientes", icon: Users },
   { label: "Produtos", slug: "produtos", icon: Package },
   { label: "Tabelas de Lentes", slug: "tabelas-de-lentes", icon: Glasses, children: kids("Lentes Monofocais", "Lentes Multifocais", "Lentes de Contato", "Tratamentos") },

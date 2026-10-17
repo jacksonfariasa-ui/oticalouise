@@ -12,7 +12,7 @@ export const roleLabel = (r: Role | null | undefined) => ROLES.find((x) => x.val
 const LENTES = ["tabelas-de-lentes", "lentes-monofocais", "lentes-multifocais", "lentes-de-contato", "tratamentos"];
 
 const VENDEDOR = new Set([
-  "", "clientes", "produtos", ...LENTES, "promocoes", "orcamentos", "vendas", "pedidos", "solucoes",
+  "", "realizar-venda", "clientes", "produtos", ...LENTES, "promocoes", "orcamentos", "vendas", "pedidos", "solucoes",
   "cashback", "agenda", "otica-zap", "pupilometro-virtual", "vitrine-online", "plug-chat", "boleto-facil",
   "analise-de-credito", "venda-mais",
 ]);

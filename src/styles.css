@@ -166,3 +166,10 @@
   --color-warning: var(--warning);
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 }
+
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; inset: 0; padding: 0; background: #fff; color: #000; }
+  .no-print { display: none !important; }
+}

@@ -17,6 +17,7 @@ import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedOticaZapRouteImport } from './routes/_authenticated/otica-zap'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
 import { Route as AuthenticatedPromocoesRouteImport } from './routes/_authenticated/promocoes'
+import { Route as AuthenticatedRealizarVendaRouteImport } from './routes/_authenticated/realizar-venda'
 import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
 import { Route as AuthenticatedLentesTipoRouteImport } from './routes/_authenticated/lentes.$tipo'
 import { Route as AuthenticatedModuloSlugRouteImport } from './routes/_authenticated/modulo.$slug'
@@ -60,6 +61,12 @@ const AuthenticatedPromocoesRoute = AuthenticatedPromocoesRouteImport.update({
   path: '/promocoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRealizarVendaRoute =
+  AuthenticatedRealizarVendaRouteImport.update({
+    id: '/realizar-venda',
+    path: '/realizar-venda',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedUsuariosRoute = AuthenticatedUsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
@@ -84,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/otica-zap': typeof AuthenticatedOticaZapRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/promocoes': typeof AuthenticatedPromocoesRoute
+  '/realizar-venda': typeof AuthenticatedRealizarVendaRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/lentes/$tipo': typeof AuthenticatedLentesTipoRoute
   '/modulo/$slug': typeof AuthenticatedModuloSlugRoute
@@ -95,6 +103,7 @@ export interface FileRoutesByTo {
   '/otica-zap': typeof AuthenticatedOticaZapRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/promocoes': typeof AuthenticatedPromocoesRoute
+  '/realizar-venda': typeof AuthenticatedRealizarVendaRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/': typeof AuthenticatedIndexRoute
   '/lentes/$tipo': typeof AuthenticatedLentesTipoRoute
@@ -109,6 +118,7 @@ export interface FileRoutesById {
   '/_authenticated/otica-zap': typeof AuthenticatedOticaZapRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/promocoes': typeof AuthenticatedPromocoesRoute
+  '/_authenticated/realizar-venda': typeof AuthenticatedRealizarVendaRoute
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/lentes/$tipo': typeof AuthenticatedLentesTipoRoute
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/otica-zap'
     | '/produtos'
     | '/promocoes'
+    | '/realizar-venda'
     | '/usuarios'
     | '/lentes/$tipo'
     | '/modulo/$slug'
@@ -135,6 +146,7 @@ export interface FileRouteTypes {
     | '/otica-zap'
     | '/produtos'
     | '/promocoes'
+    | '/realizar-venda'
     | '/usuarios'
     | '/'
     | '/lentes/$tipo'
@@ -148,6 +160,7 @@ export interface FileRouteTypes {
     | '/_authenticated/otica-zap'
     | '/_authenticated/produtos'
     | '/_authenticated/promocoes'
+    | '/_authenticated/realizar-venda'
     | '/_authenticated/usuarios'
     | '/_authenticated/'
     | '/_authenticated/lentes/$tipo'
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPromocoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/realizar-venda': {
+      id: '/_authenticated/realizar-venda'
+      path: '/realizar-venda'
+      fullPath: '/realizar-venda'
+      preLoaderRoute: typeof AuthenticatedRealizarVendaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/usuarios': {
       id: '/_authenticated/usuarios'
       path: '/usuarios'
@@ -247,6 +267,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOticaZapRoute: typeof AuthenticatedOticaZapRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedPromocoesRoute: typeof AuthenticatedPromocoesRoute
+  AuthenticatedRealizarVendaRoute: typeof AuthenticatedRealizarVendaRoute
   AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedLentesTipoRoute: typeof AuthenticatedLentesTipoRoute
@@ -258,6 +279,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOticaZapRoute: AuthenticatedOticaZapRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedPromocoesRoute: AuthenticatedPromocoesRoute,
+  AuthenticatedRealizarVendaRoute: AuthenticatedRealizarVendaRoute,
   AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedLentesTipoRoute: AuthenticatedLentesTipoRoute,
