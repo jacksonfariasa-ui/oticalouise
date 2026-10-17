@@ -11,6 +11,7 @@ function Item({ to, active, children, onNav }: { to: string; active: boolean; ch
   );
   if (to === "/") return <Link to="/" className={cls} onClick={onNav}>{children}</Link>;
   if (to === "otica-zap") return <Link to="/otica-zap" className={cls} onClick={onNav}>{children}</Link>;
+  if (to === "clientes") return <Link to="/clientes" className={cls} onClick={onNav}>{children}</Link>;
   return <Link to="/modulo/$slug" params={{ slug: to }} className={cls} onClick={onNav}>{children}</Link>;
 }
 
@@ -18,7 +19,7 @@ export function AppSidebar({ onNav }: { onNav: () => void }) {
   const { pathname } = useLocation();
   const [open, setOpen] = useState<string | null>(null);
   const isActive = (slug: string) =>
-    slug === "" ? pathname === "/" : slug === "otica-zap" ? pathname === "/otica-zap" : pathname === `/modulo/${slug}`;
+    slug === "" ? pathname === "/" : slug === "otica-zap" || slug === "clientes" ? pathname === `/${slug}` : pathname === `/modulo/${slug}`;
 
   return (
     <nav className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
