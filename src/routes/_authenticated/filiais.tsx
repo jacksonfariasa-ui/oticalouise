@@ -62,7 +62,7 @@ const STATUS_CLS: Record<Filial["status"], string> = {
 
 function Filiais() {
   const [lista, setLista] = useState(INICIAIS);
-  const [selId, setSelId] = useState(INICIAIS[0].id);
+  const [selId, setSelId] = useState("matriz");
   const [edit, setEdit] = useState<Filial | null>(null);
   const sel = lista.find((f) => f.id === selId)!;
 
