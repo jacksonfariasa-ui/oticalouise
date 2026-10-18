@@ -1,18 +1,19 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Lock, Mail, User } from "lucide-react";
+import { Lock, User } from "lucide-react";
 import logo from "@/assets/otica-louise.jpg.asset.json";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { ROLES } from "@/lib/permissions";
+import { loginEmail } from "@/lib/username";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Entrar — Ótica Louise" },
-      { name: "description", content: "Acesse o sistema de gestão da Ótica Louise com seu e-mail e senha." },
+      { name: "description", content: "Acesse o sistema de gestão da Ótica Louise com seu nome e senha." },
       { property: "og:title", content: "Entrar — Ótica Louise" },
-      { property: "og:description", content: "Acesse o sistema de gestão da Ótica Louise com seu e-mail e senha." },
+      { property: "og:description", content: "Acesse o sistema de gestão da Ótica Louise com seu nome e senha." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { loginEmail, normalizeUsername } from "@/lib/username";
 
 const roleEnum = z.enum(["admin", "gerente", "vendedor", "tecnico"]);
 
@@ -33,17 +34,17 @@ export const createUser = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z.object({
       nome: z.string().trim().min(2).max(100),
-      email: z.string().trim().email().max(255),
-      senha: z.string().min(8).max(72),
+      senha: z.string().min(6).max(72),
       role: roleEnum,
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
     const admin = await assertAdmin(context);
+    if (!normalizeUsername(data.nome)) throw new Error("Informe um nome válido.");
     const { data: created, error } = await admin.auth.admin.createUser({
-      email: data.email, password: data.senha, email_confirm: true, user_metadata: { nome: data.nome },
+      email: loginEmail(data.nome), password: data.senha, email_confirm: true, user_metadata: { nome: data.nome },
     });
-    if (error || !created.user) throw new Error(error?.message.includes("already") ? "Este e-mail já está cadastrado." : "Não foi possível criar o usuário.");
+    if (error || !created.user) throw new Error(error?.message.includes("already") ? "Já existe um usuário com este nome." : "Não foi possível criar o usuário.");
     await admin.from("user_roles").delete().eq("user_id", created.user.id);
     await admin.from("user_roles").insert({ user_id: created.user.id, role: data.role });
     return { ok: true };
@@ -62,7 +63,7 @@ export const setUserRole = createServerFn({ method: "POST" })
 
 export const resetUserPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ userId: z.string().uuid(), senha: z.string().min(8).max(72) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ userId: z.string().uuid(), senha: z.string().min(6).max(72) }).parse(d))
   .handler(async ({ data, context }) => {
     const admin = await assertAdmin(context);
     const { error } = await admin.auth.admin.updateUserById(data.userId, { password: data.senha });
