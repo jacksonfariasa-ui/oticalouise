@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { exigeFilial, FILIAIS_OPCOES } from "@/lib/filiais";
 import { loginEmail, normalizeUsername } from "@/lib/username";
 
 const roleEnum = z.enum(["admin", "gerente", "vendedor", "tecnico"]);
@@ -17,7 +18,7 @@ export const listUsers = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const admin = await assertAdmin(context);
     const [{ data: profiles }, { data: roles }, { data: auth }] = await Promise.all([
-      admin.from("profiles").select("id, nome, email, created_at").order("created_at"),
+      admin.from("profiles").select("id, nome, email, filial, created_at").order("created_at"),
       admin.from("user_roles").select("user_id, role"),
       admin.auth.admin.listUsers({ perPage: 200 }),
     ]);
@@ -36,7 +37,8 @@ export const createUser = createServerFn({ method: "POST" })
       nome: z.string().trim().min(2).max(100),
       senha: z.string().min(6).max(72),
       role: roleEnum,
-    }).parse(d),
+      filial: z.string().nullable().optional(),
+    }).refine((v) => !exigeFilial(v.role) || FILIAIS_OPCOES.some((f) => f.id === v.filial), { message: "Selecione a filial do vendedor/gerente." }).parse(d),
   )
   .handler(async ({ data, context }) => {
     const admin = await assertAdmin(context);
@@ -47,6 +49,7 @@ export const createUser = createServerFn({ method: "POST" })
     if (error || !created.user) throw new Error(error?.message.includes("already") ? "Já existe um usuário com este nome." : "Não foi possível criar o usuário.");
     await admin.from("user_roles").delete().eq("user_id", created.user.id);
     await admin.from("user_roles").insert({ user_id: created.user.id, role: data.role });
+    await admin.from("profiles").update({ filial: exigeFilial(data.role) ? data.filial : null }).eq("id", created.user.id);
     return { ok: true };
   });
 
@@ -79,5 +82,18 @@ export const deleteUser = createServerFn({ method: "POST" })
     if (data.userId === context.userId) throw new Error("Você não pode excluir a própria conta.");
     const { error } = await admin.auth.admin.deleteUser(data.userId);
     if (error) throw new Error("Não foi possível excluir o usuário.");
+    return { ok: true };
+  });
+
+export const setUserFilial = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ userId: z.string().uuid(), filial: z.string().nullable() })
+      .refine((v) => v.filial === null || FILIAIS_OPCOES.some((f) => f.id === v.filial), { message: "Filial inválida." }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const admin = await assertAdmin(context);
+    const { error } = await admin.from("profiles").update({ filial: data.filial }).eq("id", data.userId);
+    if (error) throw new Error("Não foi possível alterar a filial.");
     return { ok: true };
   });
