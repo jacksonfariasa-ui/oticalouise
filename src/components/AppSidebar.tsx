@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { InstallApp } from "@/components/InstallApp";
 import logo from "@/assets/otica-louise.jpg.asset.json";
 
+const FILIAIS = ["matriz", "rorainopolis", "pintolandia"];
 const LENTES = ["lentes-monofocais", "lentes-multifocais", "lentes-de-contato", "tratamentos"];
 
 function Item({ to, active, children, onNav }: { to: string; active: boolean; children: React.ReactNode; onNav: () => void }) {
@@ -23,6 +24,8 @@ function Item({ to, active, children, onNav }: { to: string; active: boolean; ch
   if (to === "clientes") return <Link to="/clientes" className={cls} onClick={onNav}>{children}</Link>;
   if (to === "promocoes") return <Link to="/promocoes" className={cls} onClick={onNav}>{children}</Link>;
   if (to === "filiais") return <Link to="/filiais" className={cls} onClick={onNav}>{children}</Link>;
+  if (to === "relatorio") return <Link to="/filiais/relatorio" className={cls} onClick={onNav}>{children}</Link>;
+  if (FILIAIS.includes(to)) return <Link to="/filiais/$id" params={{ id: to }} className={cls} onClick={onNav}>{children}</Link>;
   if (to === "produtos") return <Link to="/produtos" className={cls} onClick={onNav}>{children}</Link>;
   if (to === "administracao") return <Link to="/usuarios" className={cls} onClick={onNav}>{children}</Link>;
   if (LENTES.includes(to)) return <Link to="/lentes/$tipo" params={{ tipo: to }} className={cls} onClick={onNav}>{children}</Link>;
@@ -39,6 +42,7 @@ export function AppSidebar({ onNav }: { onNav: () => void }) {
     slug === "" ? pathname === "/"
       : slug === "administracao" ? pathname === "/usuarios"
       : ["realizar-venda", "otica-zap", "clientes", "produtos", "promocoes", "filiais"].includes(slug) ? pathname === `/${slug}`
+      : slug === "relatorio" || FILIAIS.includes(slug) ? pathname === `/filiais/${slug}`
       : LENTES.includes(slug) ? pathname === `/lentes/${slug}` : pathname === `/modulo/${slug}`;
 
   const items = NAV.map((n) => (n.children ? { ...n, children: n.children.filter((c) => canAccess(role, c.slug)) } : n))

@@ -28,7 +28,7 @@ export const NAV: NavItem[] = [
   { label: "Relatórios", slug: "relatorios", icon: BarChart3 },
   { label: "Financeiro", slug: "financeiro", icon: Wallet, children: kids("Contas a pagar", "Contas a receber", "Fluxo de caixa") },
   { label: "Estoque", slug: "estoque", icon: Boxes, children: kids("Validade de produtos", "Produtos abaixo do mínimo") },
-  { label: "Filiais", slug: "filiais", icon: Store },
+  { label: "Filiais", slug: "filiais-menu", icon: Store, children: [{ label: "Visão geral", slug: "filiais" }, { label: "Matriz", slug: "matriz" }, { label: "Filial Rorainópolis", slug: "rorainopolis" }, { label: "Filial Pintolândia", slug: "pintolandia" }, { label: "Relatório final", slug: "relatorio" }] },
   { label: "Controle Patrimonial", slug: "controle-patrimonial", icon: Building2 },
   { label: "Cadastros", slug: "cadastros", icon: FolderPlus },
   { label: "Administração", slug: "administracao", icon: Settings },
