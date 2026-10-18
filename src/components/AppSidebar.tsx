@@ -22,6 +22,7 @@ function Item({ to, active, children, onNav }: { to: string; active: boolean; ch
   if (to === "realizar-venda") return <Link to="/realizar-venda" className={cls} onClick={onNav}>{children}</Link>;
   if (to === "clientes") return <Link to="/clientes" className={cls} onClick={onNav}>{children}</Link>;
   if (to === "promocoes") return <Link to="/promocoes" className={cls} onClick={onNav}>{children}</Link>;
+  if (to === "filiais") return <Link to="/filiais" className={cls} onClick={onNav}>{children}</Link>;
   if (to === "produtos") return <Link to="/produtos" className={cls} onClick={onNav}>{children}</Link>;
   if (to === "administracao") return <Link to="/usuarios" className={cls} onClick={onNav}>{children}</Link>;
   if (LENTES.includes(to)) return <Link to="/lentes/$tipo" params={{ tipo: to }} className={cls} onClick={onNav}>{children}</Link>;
@@ -37,7 +38,7 @@ export function AppSidebar({ onNav }: { onNav: () => void }) {
   const isActive = (slug: string) =>
     slug === "" ? pathname === "/"
       : slug === "administracao" ? pathname === "/usuarios"
-      : ["realizar-venda", "otica-zap", "clientes", "produtos", "promocoes"].includes(slug) ? pathname === `/${slug}`
+      : ["realizar-venda", "otica-zap", "clientes", "produtos", "promocoes", "filiais"].includes(slug) ? pathname === `/${slug}`
       : LENTES.includes(slug) ? pathname === `/lentes/${slug}` : pathname === `/modulo/${slug}`;
 
   const items = NAV.map((n) => (n.children ? { ...n, children: n.children.filter((c) => canAccess(role, c.slug)) } : n))

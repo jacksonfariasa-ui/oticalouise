@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
+import { Route as AuthenticatedFiliaisRouteImport } from './routes/_authenticated/filiais'
 import { Route as AuthenticatedOticaZapRouteImport } from './routes/_authenticated/otica-zap'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
 import { Route as AuthenticatedPromocoesRouteImport } from './routes/_authenticated/promocoes'
@@ -44,6 +45,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
 const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
   id: '/clientes',
   path: '/clientes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFiliaisRoute = AuthenticatedFiliaisRouteImport.update({
+  id: '/filiais',
+  path: '/filiais',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedOticaZapRoute = AuthenticatedOticaZapRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/clientes': typeof AuthenticatedClientesRoute
+  '/filiais': typeof AuthenticatedFiliaisRoute
   '/otica-zap': typeof AuthenticatedOticaZapRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/promocoes': typeof AuthenticatedPromocoesRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/clientes': typeof AuthenticatedClientesRoute
+  '/filiais': typeof AuthenticatedFiliaisRoute
   '/otica-zap': typeof AuthenticatedOticaZapRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/promocoes': typeof AuthenticatedPromocoesRoute
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
+  '/_authenticated/filiais': typeof AuthenticatedFiliaisRoute
   '/_authenticated/otica-zap': typeof AuthenticatedOticaZapRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/promocoes': typeof AuthenticatedPromocoesRoute
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/clientes'
+    | '/filiais'
     | '/otica-zap'
     | '/produtos'
     | '/promocoes'
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/clientes'
+    | '/filiais'
     | '/otica-zap'
     | '/produtos'
     | '/promocoes'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/_authenticated/clientes'
+    | '/_authenticated/filiais'
     | '/_authenticated/otica-zap'
     | '/_authenticated/produtos'
     | '/_authenticated/promocoes'
@@ -208,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/clientes'
       fullPath: '/clientes'
       preLoaderRoute: typeof AuthenticatedClientesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/filiais': {
+      id: '/_authenticated/filiais'
+      path: '/filiais'
+      fullPath: '/filiais'
+      preLoaderRoute: typeof AuthenticatedFiliaisRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/otica-zap': {
@@ -264,6 +283,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
+  AuthenticatedFiliaisRoute: typeof AuthenticatedFiliaisRoute
   AuthenticatedOticaZapRoute: typeof AuthenticatedOticaZapRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedPromocoesRoute: typeof AuthenticatedPromocoesRoute
@@ -276,6 +296,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
+  AuthenticatedFiliaisRoute: AuthenticatedFiliaisRoute,
   AuthenticatedOticaZapRoute: AuthenticatedOticaZapRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedPromocoesRoute: AuthenticatedPromocoesRoute,
