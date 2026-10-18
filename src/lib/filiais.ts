@@ -40,7 +40,7 @@ export const STATUS_CLS: Record<Filial["status"], string> = {
 };
 
 
-export type Venda = { id: number; data: string; cliente: string; descricao: string; valor: number };
+export type Venda = { id: number; data: string; cliente: string; descricao: string; valor: number; vendedor: string };
 export type OS = { id: number; numero: string; cliente: string; servico: string; status: "Aberta" | "Concluída" };
 export type ItemEstoque = { id: number; produto: string; categoria: string; qtd: number };
 export type Unidade = Filial & { vendasLista: Venda[]; osLista: OS[]; estoqueLista: ItemEstoque[] };
@@ -48,9 +48,9 @@ export type Unidade = Filial & { vendasLista: Venda[]; osLista: OS[]; estoqueLis
 const EXTRA: Record<string, Pick<Unidade, "vendasLista" | "osLista" | "estoqueLista">> = {
   matriz: {
     vendasLista: [
-      { id: 1, data: "2026-10-16", cliente: "Mariana Souza", descricao: "Armação Ray-Ban + lente multifocal", valor: 1890 },
-      { id: 2, data: "2026-10-15", cliente: "Carlos Mendes", descricao: "Lente de contato mensal (2 cx)", valor: 340 },
-      { id: 3, data: "2026-10-14", cliente: "Fernanda Lima", descricao: "Óculos de sol Oakley", valor: 980 },
+      { id: 1, data: "2026-10-16", cliente: "Mariana Souza", descricao: "Armação Ray-Ban + lente multifocal", valor: 1890, vendedor: "Rafael Costa" },
+      { id: 2, data: "2026-10-15", cliente: "Carlos Mendes", descricao: "Lente de contato mensal (2 cx)", valor: 340, vendedor: "Juliana Prado" },
+      { id: 3, data: "2026-10-14", cliente: "Fernanda Lima", descricao: "Óculos de sol Oakley", valor: 980, vendedor: "Rafael Costa" },
     ],
     osLista: [
       { id: 1, numero: "OS-1042", cliente: "Mariana Souza", servico: "Montagem multifocal", status: "Aberta" },
@@ -64,8 +64,8 @@ const EXTRA: Record<string, Pick<Unidade, "vendasLista" | "osLista" | "estoqueLi
   },
   rorainopolis: {
     vendasLista: [
-      { id: 1, data: "2026-10-16", cliente: "Antônio Ribeiro", descricao: "Armação Chilli Beans + monofocal", valor: 620 },
-      { id: 2, data: "2026-10-13", cliente: "Sônia Batista", descricao: "Lente com antirreflexo", valor: 450 },
+      { id: 1, data: "2026-10-16", cliente: "Antônio Ribeiro", descricao: "Armação Chilli Beans + monofocal", valor: 620, vendedor: "Aline Souza" },
+      { id: 2, data: "2026-10-13", cliente: "Sônia Batista", descricao: "Lente com antirreflexo", valor: 450, vendedor: "Aline Souza" },
     ],
     osLista: [
       { id: 1, numero: "OS-2210", cliente: "Antônio Ribeiro", servico: "Montagem monofocal", status: "Aberta" },
@@ -77,9 +77,9 @@ const EXTRA: Record<string, Pick<Unidade, "vendasLista" | "osLista" | "estoqueLi
   },
   pintolandia: {
     vendasLista: [
-      { id: 1, data: "2026-10-17", cliente: "Rosa Nascimento", descricao: "Armação Vogue + lente Transitions", valor: 1450 },
-      { id: 2, data: "2026-10-15", cliente: "Pedro Henrique", descricao: "Óculos infantil", valor: 390 },
-      { id: 3, data: "2026-10-12", cliente: "Lucas Moraes", descricao: "Lente de contato colorida", valor: 260 },
+      { id: 1, data: "2026-10-17", cliente: "Rosa Nascimento", descricao: "Armação Vogue + lente Transitions", valor: 1450, vendedor: "Thiago Alves" },
+      { id: 2, data: "2026-10-15", cliente: "Pedro Henrique", descricao: "Óculos infantil", valor: 390, vendedor: "Larissa Melo" },
+      { id: 3, data: "2026-10-12", cliente: "Lucas Moraes", descricao: "Lente de contato colorida", valor: 260, vendedor: "Thiago Alves" },
     ],
     osLista: [
       { id: 1, numero: "OS-3105", cliente: "Rosa Nascimento", servico: "Montagem Transitions", status: "Aberta" },
