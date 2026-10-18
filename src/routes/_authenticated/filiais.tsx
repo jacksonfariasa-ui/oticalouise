@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useFiliais, updateFilial, brl, MESES, STATUS_CLS, type Filial } from "@/lib/filiais";
 
 export const Route = createFileRoute("/_authenticated/filiais")({
   head: () => ({
@@ -21,47 +22,8 @@ export const Route = createFileRoute("/_authenticated/filiais")({
   component: Filiais,
 });
 
-type Membro = { nome: string; cargo: string };
-type Filial = {
-  id: string; nome: string; tipo: "Matriz" | "Filial"; status: "Ativa" | "Em reforma" | "Inativa";
-  cnpj: string; endereco: string; cidade: string; telefone: string; email: string; horario: string;
-  gerente: string; faturamento: number; meta: number; vendas: number; osAbertas: number; estoque: number; clientes: number;
-  mensal: number[]; equipe: Membro[];
-};
-
-const MESES = ["Mai", "Jun", "Jul", "Ago", "Set", "Out"];
-
-const INICIAIS: Filial[] = [
-  {
-    id: "matriz", nome: "Matriz", tipo: "Matriz", status: "Ativa", cnpj: "12.345.678/0001-90",
-    endereco: "Av. Ville Roy, 1820 — Centro", cidade: "Boa Vista - RR", telefone: "(95) 3224-1500", email: "matriz@oticalouise.com.br",
-    horario: "Seg a Sex 8h–18h · Sáb 8h–13h", gerente: "Louise Andrade", faturamento: 148500, meta: 160000, vendas: 312,
-    osAbertas: 27, estoque: 1840, clientes: 4210, mensal: [118, 126, 131, 139, 142, 148.5],
-    equipe: [{ nome: "Louise Andrade", cargo: "Gerente geral" }, { nome: "Rafael Costa", cargo: "Vendedor" }, { nome: "Juliana Prado", cargo: "Vendedora" }, { nome: "Marcos Lima", cargo: "Técnico óptico" }, { nome: "Patrícia Reis", cargo: "Financeiro" }],
-  },
-  {
-    id: "rorainopolis", nome: "Filial Rorainópolis", tipo: "Filial", status: "Ativa", cnpj: "12.345.678/0002-71",
-    endereco: "Av. Juscelino Kubitschek, 455 — Centro", cidade: "Rorainópolis - RR", telefone: "(95) 3238-2210", email: "rorainopolis@oticalouise.com.br",
-    horario: "Seg a Sex 8h–18h · Sáb 8h–12h", gerente: "Diego Martins", faturamento: 62300, meta: 70000, vendas: 141,
-    osAbertas: 12, estoque: 720, clientes: 1580, mensal: [48, 51, 55, 58, 60, 62.3],
-    equipe: [{ nome: "Diego Martins", cargo: "Gerente" }, { nome: "Aline Souza", cargo: "Vendedora" }, { nome: "Bruno Ferreira", cargo: "Técnico óptico" }],
-  },
-  {
-    id: "pintolandia", nome: "Filial Pintolândia", tipo: "Filial", status: "Ativa", cnpj: "12.345.678/0003-52",
-    endereco: "Rua Pedro Aldemar Bantim, 980 — Pintolândia", cidade: "Boa Vista - RR", telefone: "(95) 3626-4480", email: "pintolandia@oticalouise.com.br",
-    horario: "Seg a Sex 9h–19h · Sáb 8h–14h", gerente: "Camila Rocha", faturamento: 81900, meta: 75000, vendas: 198,
-    osAbertas: 18, estoque: 965, clientes: 2240, mensal: [61, 66, 70, 73, 77, 81.9],
-    equipe: [{ nome: "Camila Rocha", cargo: "Gerente" }, { nome: "Thiago Alves", cargo: "Vendedor" }, { nome: "Larissa Melo", cargo: "Vendedora" }, { nome: "Ênio Barbosa", cargo: "Técnico óptico" }],
-  },
-];
-
-const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
-const STATUS_CLS: Record<Filial["status"], string> = {
-  Ativa: "bg-primary/15 text-primary", "Em reforma": "bg-accent text-accent-foreground", Inativa: "bg-destructive/15 text-destructive",
-};
-
 function Filiais() {
-  const [lista, setLista] = useState(INICIAIS);
+  const lista = useFiliais();
   const [selId, setSelId] = useState("matriz");
   const [edit, setEdit] = useState<Filial | null>(null);
   const sel = lista.find((f) => f.id === selId)!;
@@ -74,7 +36,7 @@ function Filiais() {
 
   function salvar() {
     if (!edit) return;
-    setLista((l) => l.map((f) => (f.id === edit.id ? edit : f)));
+    const e = edit; updateFilial(e.id, (f) => ({ ...f, ...e }));
     setEdit(null);
   }
 

@@ -20,6 +20,8 @@ import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedPromocoesRouteImport } from './routes/_authenticated/promocoes'
 import { Route as AuthenticatedRealizarVendaRouteImport } from './routes/_authenticated/realizar-venda'
 import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
+import { Route as AuthenticatedFiliaisIdRouteImport } from './routes/_authenticated/filiais_.$id'
+import { Route as AuthenticatedFiliaisRelatorioRouteImport } from './routes/_authenticated/filiais_.relatorio'
 import { Route as AuthenticatedLentesTipoRouteImport } from './routes/_authenticated/lentes.$tipo'
 import { Route as AuthenticatedModuloSlugRouteImport } from './routes/_authenticated/modulo.$slug'
 
@@ -78,6 +80,17 @@ const AuthenticatedUsuariosRoute = AuthenticatedUsuariosRouteImport.update({
   path: '/usuarios',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFiliaisIdRoute = AuthenticatedFiliaisIdRouteImport.update({
+  id: '/filiais_/$id',
+  path: '/filiais/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFiliaisRelatorioRoute =
+  AuthenticatedFiliaisRelatorioRouteImport.update({
+    id: '/filiais_/relatorio',
+    path: '/filiais/relatorio',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLentesTipoRoute = AuthenticatedLentesTipoRouteImport.update({
   id: '/lentes/$tipo',
   path: '/lentes/$tipo',
@@ -100,6 +113,8 @@ export interface FileRoutesByFullPath {
   '/promocoes': typeof AuthenticatedPromocoesRoute
   '/realizar-venda': typeof AuthenticatedRealizarVendaRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
+  '/filiais/$id': typeof AuthenticatedFiliaisIdRoute
+  '/filiais/relatorio': typeof AuthenticatedFiliaisRelatorioRoute
   '/lentes/$tipo': typeof AuthenticatedLentesTipoRoute
   '/modulo/$slug': typeof AuthenticatedModuloSlugRoute
 }
@@ -114,6 +129,8 @@ export interface FileRoutesByTo {
   '/realizar-venda': typeof AuthenticatedRealizarVendaRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/': typeof AuthenticatedIndexRoute
+  '/filiais/$id': typeof AuthenticatedFiliaisIdRoute
+  '/filiais/relatorio': typeof AuthenticatedFiliaisRelatorioRoute
   '/lentes/$tipo': typeof AuthenticatedLentesTipoRoute
   '/modulo/$slug': typeof AuthenticatedModuloSlugRoute
 }
@@ -130,6 +147,8 @@ export interface FileRoutesById {
   '/_authenticated/realizar-venda': typeof AuthenticatedRealizarVendaRoute
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/filiais_/$id': typeof AuthenticatedFiliaisIdRoute
+  '/_authenticated/filiais_/relatorio': typeof AuthenticatedFiliaisRelatorioRoute
   '/_authenticated/lentes/$tipo': typeof AuthenticatedLentesTipoRoute
   '/_authenticated/modulo/$slug': typeof AuthenticatedModuloSlugRoute
 }
@@ -146,6 +165,8 @@ export interface FileRouteTypes {
     | '/promocoes'
     | '/realizar-venda'
     | '/usuarios'
+    | '/filiais/$id'
+    | '/filiais/relatorio'
     | '/lentes/$tipo'
     | '/modulo/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -160,6 +181,8 @@ export interface FileRouteTypes {
     | '/realizar-venda'
     | '/usuarios'
     | '/'
+    | '/filiais/$id'
+    | '/filiais/relatorio'
     | '/lentes/$tipo'
     | '/modulo/$slug'
   id:
@@ -175,6 +198,8 @@ export interface FileRouteTypes {
     | '/_authenticated/realizar-venda'
     | '/_authenticated/usuarios'
     | '/_authenticated/'
+    | '/_authenticated/filiais_/$id'
+    | '/_authenticated/filiais_/relatorio'
     | '/_authenticated/lentes/$tipo'
     | '/_authenticated/modulo/$slug'
   fileRoutesById: FileRoutesById
@@ -264,6 +289,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsuariosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/filiais_/$id': {
+      id: '/_authenticated/filiais_/$id'
+      path: '/filiais/$id'
+      fullPath: '/filiais/$id'
+      preLoaderRoute: typeof AuthenticatedFiliaisIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/filiais_/relatorio': {
+      id: '/_authenticated/filiais_/relatorio'
+      path: '/filiais/relatorio'
+      fullPath: '/filiais/relatorio'
+      preLoaderRoute: typeof AuthenticatedFiliaisRelatorioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lentes/$tipo': {
       id: '/_authenticated/lentes/$tipo'
       path: '/lentes/$tipo'
@@ -290,6 +329,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRealizarVendaRoute: typeof AuthenticatedRealizarVendaRoute
   AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedFiliaisIdRoute: typeof AuthenticatedFiliaisIdRoute
+  AuthenticatedFiliaisRelatorioRoute: typeof AuthenticatedFiliaisRelatorioRoute
   AuthenticatedLentesTipoRoute: typeof AuthenticatedLentesTipoRoute
   AuthenticatedModuloSlugRoute: typeof AuthenticatedModuloSlugRoute
 }
@@ -303,6 +344,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRealizarVendaRoute: AuthenticatedRealizarVendaRoute,
   AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedFiliaisIdRoute: AuthenticatedFiliaisIdRoute,
+  AuthenticatedFiliaisRelatorioRoute: AuthenticatedFiliaisRelatorioRoute,
   AuthenticatedLentesTipoRoute: AuthenticatedLentesTipoRoute,
   AuthenticatedModuloSlugRoute: AuthenticatedModuloSlugRoute,
 }
