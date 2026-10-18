@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { KeyRound, Plus, ShieldCheck, Trash2, X } from "lucide-react";
+import { displayLogin } from "@/lib/username";
 import { createUser, deleteUser, listUsers, resetUserPassword, setUserRole } from "@/lib/users.functions";
 import { ROLES, canAccess, roleLabel, type Role } from "@/lib/permissions";
 import { NAV } from "@/lib/nav";
@@ -62,7 +63,7 @@ function Usuarios() {
       <div className="overflow-x-auto rounded-xl border bg-card">
         <table className="w-full text-sm">
           <thead className="border-b text-left text-xs uppercase text-muted-foreground">
-            <tr><th className="p-3">Nome</th><th className="p-3">E-mail</th><th className="p-3">Perfil</th><th className="p-3">Último acesso</th><th className="p-3 text-right">Ações</th></tr>
+            <tr><th className="p-3">Nome</th><th className="p-3">Login</th><th className="p-3">Perfil</th><th className="p-3">Último acesso</th><th className="p-3 text-right">Ações</th></tr>
           </thead>
           <tbody>
             {isLoading && <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Carregando…</td></tr>}
@@ -71,7 +72,7 @@ function Usuarios() {
               return (
                 <tr key={u.id} className="border-b last:border-0">
                   <td className="p-3 font-medium">{u.nome}{self && <span className="ml-2 text-xs text-muted-foreground">(você)</span>}</td>
-                  <td className="p-3 text-muted-foreground">{u.email}</td>
+                  <td className="p-3 text-muted-foreground">{displayLogin(u.email)}</td>
                   <td className="p-3">
                     <select disabled={self} value={u.role ?? ""} onChange={(e) => { setErro(""); run.mutate(() => setRole({ data: { userId: u.id, role: e.target.value as Role } })); }} className="rounded-md border bg-background px-2 py-1">
                       {!u.role && <option value="">Aguardando liberação</option>}
@@ -81,7 +82,7 @@ function Usuarios() {
                   <td className="p-3 text-muted-foreground">{u.ultimo_acesso ? new Date(u.ultimo_acesso).toLocaleString("pt-BR") : "Nunca"}</td>
                   <td className="p-3">
                     <div className="flex justify-end gap-1">
-                      <button title="Definir nova senha" onClick={() => { const s = prompt(`Nova senha para ${u.nome} (mín. 8 caracteres):`); if (s) { setErro(""); run.mutate(() => reset({ data: { userId: u.id, senha: s } })); } }} className="rounded p-2 hover:bg-accent"><KeyRound className="h-4 w-4" /></button>
+                      <button title="Definir nova senha" onClick={() => { const s = prompt(`Nova senha para ${u.nome} :`); if (s) { setErro(""); run.mutate(() => reset({ data: { userId: u.id, senha: s } })); } }} className="rounded p-2 hover:bg-accent"><KeyRound className="h-4 w-4" /></button>
                       {!self && <button title="Excluir" onClick={() => { if (confirm(`Excluir ${u.nome}?`)) { setErro(""); run.mutate(() => del({ data: { userId: u.id } })); } }} className="rounded p-2 text-destructive hover:bg-accent"><Trash2 className="h-4 w-4" /></button>}
                     </div>
                   </td>
@@ -119,15 +120,15 @@ function Usuarios() {
   );
 }
 
-function NovoUsuario({ onClose, onSave }: { onClose: () => void; onSave: (d: { nome: string; email: string; senha: string; role: Role }) => Promise<void> }) {
-  const [f, setF] = useState({ nome: "", email: "", senha: "", role: "vendedor" as Role });
+function NovoUsuario({ onClose, onSave }: { onClose: () => void; onSave: (d: { nome: string; senha: string; role: Role }) => Promise<void> }) {
+  const [f, setF] = useState({ nome: "", senha: "", role: "vendedor" as Role });
   const [erro, setErro] = useState("");
   const [busy, setBusy] = useState(false);
   const inp = "w-full rounded-md border bg-background px-3 py-2 text-sm";
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (f.nome.trim().length < 2) return setErro("Informe o nome");
-    if (f.senha.length < 8) return setErro("A senha precisa de ao menos 8 caracteres");
+    if (!f.senha) return setErro("Informe a senha");
     setBusy(true);
     try { await onSave(f); onClose(); } catch (err) { setErro((err as Error).message); } finally { setBusy(false); }
   }
@@ -135,9 +136,8 @@ function NovoUsuario({ onClose, onSave }: { onClose: () => void; onSave: (d: { n
     <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/40 p-4">
       <form onSubmit={submit} className="w-full max-w-md space-y-3 rounded-xl border bg-card p-6">
         <div className="flex items-center justify-between"><h2 className="text-lg font-bold">Novo usuário</h2><button type="button" onClick={onClose}><X className="h-5 w-5" /></button></div>
-        <input className={inp} placeholder="Nome completo" value={f.nome} onChange={(e) => setF({ ...f, nome: e.target.value })} />
-        <input className={inp} type="email" placeholder="E-mail de acesso" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} required />
-        <input className={inp} type="text" placeholder="Senha inicial (mín. 8)" value={f.senha} onChange={(e) => setF({ ...f, senha: e.target.value })} />
+        <input className={inp} placeholder="Nome (usado para entrar)" value={f.nome} onChange={(e) => setF({ ...f, nome: e.target.value })} />
+        <input className={inp} type="text" placeholder="Senha" value={f.senha} onChange={(e) => setF({ ...f, senha: e.target.value })} />
         <div className="space-y-2">
           {ROLES.map((r) => (
             <label key={r.value} className="flex cursor-pointer items-start gap-3 rounded-md border p-3 has-[:checked]:border-primary">
@@ -147,7 +147,7 @@ function NovoUsuario({ onClose, onSave }: { onClose: () => void; onSave: (d: { n
           ))}
         </div>
         {erro && <p className="text-sm text-destructive">{erro}</p>}
-        <p className="text-xs text-muted-foreground">Perfil escolhido: {roleLabel(f.role)}. Entregue o e-mail e a senha à pessoa; ela já pode entrar.</p>
+        <p className="text-xs text-muted-foreground">Perfil escolhido: {roleLabel(f.role)}. Entregue o nome e a senha à pessoa; ela já pode entrar.</p>
         <button disabled={busy} className="w-full rounded-md bg-primary py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60">{busy ? "Salvando…" : "Criar usuário"}</button>
       </form>
     </div>
