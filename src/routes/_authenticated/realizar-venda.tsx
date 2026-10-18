@@ -1,3 +1,4 @@
+import { printElement } from "@/lib/print";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { FileText, Minus, Plus, Printer, Search, ShoppingBag, Trash2, Eye, ArrowRightLeft } from "lucide-react";
@@ -272,7 +273,7 @@ function RealizarVenda() {
           {visualizar && <DocumentoImpresso doc={visualizar} />}
           <div className="no-print flex justify-end gap-2">
             <Button variant="outline" onClick={() => setVisualizar(null)}>Fechar</Button>
-            <Button onClick={() => window.print()}><Printer className="mr-2 h-4 w-4" />Imprimir</Button>
+            <Button onClick={() => printElement(document.querySelector(".print-area") as HTMLElement)}><Printer className="mr-2 h-4 w-4" />Imprimir</Button>
           </div>
         </DialogContent>
       </Dialog>

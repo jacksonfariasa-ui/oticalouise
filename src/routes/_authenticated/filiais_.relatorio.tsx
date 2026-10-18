@@ -1,3 +1,4 @@
+import { printElement } from "@/lib/print";
 import { createFileRoute } from "@tanstack/react-router";
 import { Printer, FileBarChart } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -46,7 +47,7 @@ function Relatorio() {
           <h1 className="text-2xl font-bold">Relatório final das filiais</h1>
           <p className="text-sm text-muted-foreground">Consolidado da Matriz, Filial Rorainópolis e Filial Pintolândia</p>
         </div>
-        <Button onClick={() => window.print()}><Printer className="mr-1 h-4 w-4" />Gerar relatório (imprimir / PDF)</Button>
+        <Button onClick={() => printElement(document.querySelector(".print-area") as HTMLElement)}><Printer className="mr-1 h-4 w-4" />Gerar relatório (imprimir / PDF)</Button>
       </header>
 
       <Card className="print-area space-y-6 p-6">
