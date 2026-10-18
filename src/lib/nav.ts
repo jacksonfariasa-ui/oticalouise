@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Users, Package, Glasses, Tag, FileText, Wrench, ShoppingCart, ClipboardList,
-  ListChecks, ShoppingBag, Sparkles, TrendingUp, Megaphone, BarChart3, Wallet, Boxes, Building2, FolderPlus, Settings,
+  ListChecks, ShoppingBag, Sparkles, TrendingUp, Megaphone, BarChart3, Wallet, Boxes, Building2, FolderPlus, Settings, Store,
   type LucideIcon,
 } from "lucide-react";
 
@@ -28,6 +28,7 @@ export const NAV: NavItem[] = [
   { label: "Relatórios", slug: "relatorios", icon: BarChart3 },
   { label: "Financeiro", slug: "financeiro", icon: Wallet, children: kids("Contas a pagar", "Contas a receber", "Fluxo de caixa") },
   { label: "Estoque", slug: "estoque", icon: Boxes, children: kids("Validade de produtos", "Produtos abaixo do mínimo") },
+  { label: "Filiais", slug: "filiais", icon: Store },
   { label: "Controle Patrimonial", slug: "controle-patrimonial", icon: Building2 },
   { label: "Cadastros", slug: "cadastros", icon: FolderPlus },
   { label: "Administração", slug: "administracao", icon: Settings },
