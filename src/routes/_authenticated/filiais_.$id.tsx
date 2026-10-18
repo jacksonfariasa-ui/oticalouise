@@ -1,11 +1,13 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { Building2, ShoppingCart, Wrench, Package, Users, Plus, Trash2, CheckCircle2, TrendingUp } from "lucide-react";
+import { Building2, ShoppingCart, Wrench, Package, Users, Plus, Trash2, CheckCircle2, TrendingUp, Search, ShieldCheck, Trophy, Target } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFiliais, updateFilial, brl } from "@/lib/filiais";
+import { useAuth } from "@/lib/auth";
+import { roleLabel } from "@/lib/permissions";
 
 const NOMES: Record<string, string> = { matriz: "Matriz", rorainopolis: "Filial Rorainópolis", pintolandia: "Filial Pintolândia" };
 
@@ -32,6 +34,10 @@ const hoje = () => new Date().toISOString().slice(0, 10);
 function Unidade() {
   const { id } = Route.useParams();
   const f = useFiliais().find((x) => x.id === id);
+  const { role, nome } = useAuth();
+  const gestor = role === "admin" || role === "gerente";
+  const [buscaEst, setBuscaEst] = useState("");
+  const [meta, setMeta] = useState("");
   const [venda, setVenda] = useState({ cliente: "", descricao: "", valor: "" });
   const [os, setOs] = useState({ cliente: "", servico: "" });
   const [item, setItem] = useState({ produto: "", categoria: "", qtd: "" });
@@ -43,7 +49,7 @@ function Unidade() {
     const valor = Number(venda.valor);
     if (!venda.cliente || !valor) return;
     updateFilial(id, (u) => ({ ...u, vendas: u.vendas + 1, faturamento: u.faturamento + valor,
-      vendasLista: [{ id: nextId(u.vendasLista), data: hoje(), cliente: venda.cliente, descricao: venda.descricao, valor }, ...u.vendasLista] }));
+      vendasLista: [{ id: nextId(u.vendasLista), data: hoje(), cliente: venda.cliente, descricao: venda.descricao, valor, vendedor: nome || "Vendedor" }, ...u.vendasLista] }));
     setVenda({ cliente: "", descricao: "", valor: "" });
   }
   function delVenda(vid: number) {
@@ -77,6 +83,13 @@ function Unidade() {
   }
 
   const pct = Math.round((f.faturamento / f.meta) * 100);
+  const minhas = f.vendasLista.filter((v) => v.vendedor === nome);
+  const meuTotal = minhas.reduce((a, v) => a + v.valor, 0);
+  const porVendedor = Object.entries(f.vendasLista.reduce<Record<string, { qtd: number; total: number }>>((acc, v) => {
+    const r = (acc[v.vendedor] ??= { qtd: 0, total: 0 }); r.qtd++; r.total += v.valor; return acc;
+  }, {})).sort((a, b) => b[1].total - a[1].total);
+  const estoqueVis = f.estoqueLista.filter((i) => `${i.produto} ${i.categoria}`.toLowerCase().includes(buscaEst.toLowerCase()));
+  function salvarMeta() { const m = Number(meta); if (m > 0) { updateFilial(id, (u) => ({ ...u, meta: m })); setMeta(""); } }
 
   return (
     <div className="space-y-6">
@@ -86,22 +99,29 @@ function Unidade() {
           <h1 className="text-2xl font-bold">{f.nome}</h1>
           <p className="text-sm text-muted-foreground">{f.endereco}, {f.cidade} · Gerente: {f.gerente}</p>
         </div>
+        <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-primary/15 px-3 py-1 text-xs font-medium text-primary"><ShieldCheck className="h-3.5 w-3.5" />Acesso: {gestor ? "Gerente" : roleLabel(role)}</span>
       </header>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      {gestor ? <section className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <Kpi icon={TrendingUp} label="Faturamento" value={brl(f.faturamento)} sub={`${pct}% da meta`} />
         <Kpi icon={ShoppingCart} label="Vendas" value={String(f.vendas)} />
         <Kpi icon={Wrench} label="O.S. abertas" value={String(f.osAbertas)} />
         <Kpi icon={Package} label="Itens em estoque" value={f.estoque.toLocaleString("pt-BR")} />
         <Kpi icon={Users} label="Equipe" value={String(f.equipe.length)} />
-      </section>
+      </section> : <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Kpi icon={ShoppingCart} label="Minhas vendas" value={String(minhas.length)} />
+        <Kpi icon={TrendingUp} label="Meu faturamento" value={brl(meuTotal)} />
+        <Kpi icon={Target} label="Meta da loja" value={`${pct}%`} sub="atingido no mês" />
+        <Kpi icon={Wrench} label="O.S. abertas" value={String(f.osAbertas)} />
+      </section>}
 
       <Tabs defaultValue="vendas">
         <TabsList className="flex-wrap">
           <TabsTrigger value="vendas">Vendas</TabsTrigger>
           <TabsTrigger value="os">Ordens de serviço</TabsTrigger>
           <TabsTrigger value="estoque">Estoque</TabsTrigger>
-          <TabsTrigger value="equipe">Equipe</TabsTrigger>
+          {gestor && <TabsTrigger value="equipe">Equipe</TabsTrigger>}
+          {gestor && <TabsTrigger value="gestao">Gestão</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="vendas">
@@ -112,9 +132,9 @@ function Unidade() {
               <Input placeholder="Valor (R$)" type="number" value={venda.valor} onChange={(e) => setVenda({ ...venda, valor: e.target.value })} />
               <Button onClick={addVenda}><Plus className="mr-1 h-4 w-4" />Registrar</Button>
             </div>
-            <Lista vazio="Nenhuma venda registrada." itens={f.vendasLista.map((v) => ({
-              id: v.id, titulo: `${v.cliente} — ${brl(v.valor)}`, sub: `${v.data.split("-").reverse().join("/")} · ${v.descricao}`,
-              acao: <Button variant="ghost" size="icon" aria-label="Excluir" onClick={() => delVenda(v.id)}><Trash2 className="h-4 w-4" /></Button>,
+            <Lista vazio="Nenhuma venda registrada." itens={(gestor ? f.vendasLista : minhas).map((v) => ({
+              id: v.id, titulo: `${v.cliente} — ${brl(v.valor)}`, sub: `${v.data.split("-").reverse().join("/")} · ${v.descricao} · ${v.vendedor}`,
+              acao: gestor && <Button variant="ghost" size="icon" aria-label="Excluir" onClick={() => delVenda(v.id)}><Trash2 className="h-4 w-4" /></Button>,
             }))} />
           </Card>
         </TabsContent>
@@ -128,7 +148,7 @@ function Unidade() {
             </div>
             <Lista vazio="Nenhuma O.S. registrada." itens={f.osLista.map((o) => ({
               id: o.id, titulo: `${o.numero} · ${o.cliente}`, sub: `${o.servico} · ${o.status}`,
-              acao: o.status === "Aberta"
+              acao: o.status === "Aberta" && !gestor ? <span className="text-xs text-muted-foreground">Aberta</span> : o.status === "Aberta"
                 ? <Button variant="outline" size="sm" onClick={() => concluir(o.id)}><CheckCircle2 className="mr-1 h-4 w-4" />Concluir</Button>
                 : <span className="text-xs text-success">Concluída</span>,
             }))} />
@@ -137,15 +157,16 @@ function Unidade() {
 
         <TabsContent value="estoque">
           <Card className="space-y-4 p-5">
-            <div className="grid gap-2 sm:grid-cols-[2fr_1fr_1fr_auto]">
+            <div className="relative"><Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" /><Input className="pl-9" placeholder="Consultar produto ou categoria" value={buscaEst} onChange={(e) => setBuscaEst(e.target.value)} /></div>
+            {gestor && <div className="grid gap-2 sm:grid-cols-[2fr_1fr_1fr_auto]">
               <Input placeholder="Produto" value={item.produto} onChange={(e) => setItem({ ...item, produto: e.target.value })} />
               <Input placeholder="Categoria" value={item.categoria} onChange={(e) => setItem({ ...item, categoria: e.target.value })} />
               <Input placeholder="Quantidade" type="number" value={item.qtd} onChange={(e) => setItem({ ...item, qtd: e.target.value })} />
               <Button onClick={addItem}><Plus className="mr-1 h-4 w-4" />Adicionar</Button>
-            </div>
-            <Lista vazio="Nenhum item cadastrado." itens={f.estoqueLista.map((i) => ({
+            </div>}
+            <Lista vazio="Nenhum item encontrado." itens={estoqueVis.map((i) => ({
               id: i.id, titulo: i.produto, sub: `${i.categoria} · ${i.qtd} un.`,
-              acao: <Button variant="ghost" size="icon" aria-label="Excluir" onClick={() => delItem(i.id)}><Trash2 className="h-4 w-4" /></Button>,
+              acao: gestor && <Button variant="ghost" size="icon" aria-label="Excluir" onClick={() => delItem(i.id)}><Trash2 className="h-4 w-4" /></Button>,
             }))} />
           </Card>
         </TabsContent>
@@ -155,6 +176,21 @@ function Unidade() {
             <Lista vazio="Sem equipe." itens={f.equipe.map((m, i) => ({ id: i, titulo: m.nome, sub: m.cargo }))} />
           </Card>
         </TabsContent>
+
+        {gestor && <TabsContent value="gestao">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card className="space-y-3 p-5">
+              <h3 className="flex items-center gap-2 text-sm font-semibold"><Target className="h-4 w-4" />Meta mensal da unidade</h3>
+              <p className="text-sm text-muted-foreground">Atual: <b className="text-foreground">{brl(f.meta)}</b> · {pct}% atingido</p>
+              <div className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(pct, 100)}%` }} /></div>
+              <div className="flex gap-2"><Input type="number" placeholder="Nova meta (R$)" value={meta} onChange={(e) => setMeta(e.target.value)} /><Button onClick={salvarMeta}>Salvar</Button></div>
+            </Card>
+            <Card className="space-y-3 p-5">
+              <h3 className="flex items-center gap-2 text-sm font-semibold"><Trophy className="h-4 w-4" />Desempenho dos vendedores</h3>
+              <Lista vazio="Sem vendas registradas." itens={porVendedor.map(([n, r], i) => ({ id: i, titulo: `${i + 1}º ${n}`, sub: `${r.qtd} venda(s) · ${brl(r.total)}` }))} />
+            </Card>
+          </div>
+        </TabsContent>}
       </Tabs>
     </div>
   );
@@ -170,7 +206,7 @@ function Kpi({ icon: Icon, label, value, sub }: { icon: typeof Users; label: str
   );
 }
 
-function Lista({ itens, vazio }: { itens: { id: number; titulo: string; sub: string; acao?: React.ReactNode }[]; vazio: string }) {
+function Lista({ itens, vazio }: { itens: { id: number; titulo: string; sub: string; acao?: React.ReactNode | false }[]; vazio: string }) {
   if (!itens.length) return <p className="py-6 text-center text-sm text-muted-foreground">{vazio}</p>;
   return (
     <ul className="divide-y">
