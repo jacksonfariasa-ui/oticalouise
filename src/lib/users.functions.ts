@@ -49,7 +49,7 @@ export const createUser = createServerFn({ method: "POST" })
     if (error || !created.user) throw new Error(error?.message.includes("already") ? "Já existe um usuário com este nome." : "Não foi possível criar o usuário.");
     await admin.from("user_roles").delete().eq("user_id", created.user.id);
     await admin.from("user_roles").insert({ user_id: created.user.id, role: data.role });
-    await admin.from("profiles").update({ filial: exigeFilial(data.role) ? data.filial : null }).eq("id", created.user.id);
+    await admin.from("profiles").update({ filial: exigeFilial(data.role) ? (data.filial ?? null) : null }).eq("id", created.user.id);
     return { ok: true };
   });
 
