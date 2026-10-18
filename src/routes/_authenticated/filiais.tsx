@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { useFiliais, updateFilial, brl, MESES, type Filial } from "@/lib/filiais";
+import { useFiliais, updateFilial, brl, MESES, STATUS_CLS, type Filial } from "@/lib/filiais";
 
 export const Route = createFileRoute("/_authenticated/filiais")({
   head: () => ({

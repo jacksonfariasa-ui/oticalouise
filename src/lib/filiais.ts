@@ -34,8 +34,8 @@ const BASE: Filial[] = [
   },
 ];
 
-const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
-const STATUS_CLS: Record<Filial["status"], string> = {
+export const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+export const STATUS_CLS: Record<Filial["status"], string> = {
   Ativa: "bg-primary/15 text-primary", "Em reforma": "bg-accent text-accent-foreground", Inativa: "bg-destructive/15 text-destructive",
 };
 
@@ -93,7 +93,7 @@ const EXTRA: Record<string, Pick<Unidade, "vendasLista" | "osLista" | "estoqueLi
   },
 };
 
-let state: Unidade[] = BASE.map((f) => ({ ...f, ...EXTRA[f.id] }));
+let state: Unidade[] = BASE.map((f) => ({ ...f, ...(EXTRA[f.id] ?? { vendasLista: [], osLista: [], estoqueLista: [] }) }));
 const subs = new Set<() => void>();
 
 export function updateFilial(id: string, fn: (f: Unidade) => Unidade) {
@@ -109,4 +109,3 @@ export function useFiliais(): Unidade[] {
   );
 }
 
-export const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
