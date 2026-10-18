@@ -63,7 +63,7 @@ function Usuarios() {
       <div className="overflow-x-auto rounded-xl border bg-card">
         <table className="w-full text-sm">
           <thead className="border-b text-left text-xs uppercase text-muted-foreground">
-            <tr><th className="p-3">Nome</th><th className="p-3">E-mail</th><th className="p-3">Perfil</th><th className="p-3">Último acesso</th><th className="p-3 text-right">Ações</th></tr>
+            <tr><th className="p-3">Nome</th><th className="p-3">Login</th><th className="p-3">Perfil</th><th className="p-3">Último acesso</th><th className="p-3 text-right">Ações</th></tr>
           </thead>
           <tbody>
             {isLoading && <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Carregando…</td></tr>}
