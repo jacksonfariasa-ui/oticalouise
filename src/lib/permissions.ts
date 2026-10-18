@@ -14,7 +14,7 @@ const LENTES = ["tabelas-de-lentes", "lentes-monofocais", "lentes-multifocais", 
 const VENDEDOR = new Set([
   "", "realizar-venda", "clientes", "produtos", ...LENTES, "promocoes", "orcamentos", "vendas", "pedidos", "solucoes",
   "cashback", "agenda", "otica-zap", "pupilometro-virtual", "vitrine-online", "plug-chat", "boleto-facil",
-  "analise-de-credito", "venda-mais",
+  "analise-de-credito", "venda-mais", "matriz", "rorainopolis", "pintolandia",
 ]);
 
 const TECNICO = new Set([
