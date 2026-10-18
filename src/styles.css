@@ -180,9 +180,24 @@
 }
 
 @media print {
-  body * { visibility: hidden; }
-  .print-area, .print-area * { visibility: visible; }
-  .print-area { position: absolute; inset: 0; padding: 0; background: #fff; color: #000; }
+  @page { size: A4; margin: 12mm; }
+  html, body { background: #fff !important; height: auto !important; overflow: visible !important; }
+  /* When a print area exists, drop everything else from layout (avoids blank extra pages) */
+  body:has(.print-area) > *:not(:has(.print-area)) { display: none !important; }
+  *:has(.print-area) > *:not(.print-area):not(:has(.print-area)) { display: none !important; }
+  body:has(.print-area) [data-radix-popper-content-wrapper],
+  body:has(.print-area) [data-state][class*="bg-black"] { display: none !important; }
+  /* Un-clip dialogs/containers that hold the printable document */
+  *:has(> .print-area), *:has(.print-area) {
+    position: static !important; transform: none !important; inset: auto !important;
+    max-height: none !important; height: auto !important; overflow: visible !important;
+    box-shadow: none !important; border: 0 !important; padding: 0 !important; margin: 0 !important;
+    background: transparent !important; width: auto !important; max-width: none !important;
+    display: block !important; visibility: visible !important;
+  }
+  .print-area { position: static !important; width: 100% !important; border: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; }
+  .print-area * { color: #000 !important; }
+  .print-area img { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .no-print { display: none !important; }
 }
 
