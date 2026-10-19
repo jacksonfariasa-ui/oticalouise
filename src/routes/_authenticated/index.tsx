@@ -8,6 +8,10 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Item } from "@/components/AppSidebar";
+import { NAV } from "@/lib/nav";
+import { useAuth } from "@/lib/auth";
+import { canAccess } from "@/lib/permissions";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -64,6 +68,38 @@ const TONE = {
 };
 
 function Dashboard() {
+  const { role } = useAuth();
+  if (role === "vendedor") return <SellerHome />;
+  return <FullDashboard />;
+}
+
+function SellerHome() {
+  const { nome } = useAuth();
+  const buttons = NAV.flatMap((n) =>
+    n.children
+      ? n.children.filter((c) => canAccess("vendedor", c.slug)).map((c) => ({ label: c.label, slug: c.slug, icon: n.icon }))
+      : n.slug && canAccess("vendedor", n.slug) ? [{ label: n.label, slug: n.slug, icon: n.icon }] : [],
+  );
+  return (
+    <div className="space-y-6">
+      <div><h1 className="text-2xl font-bold">Olá, {nome}</h1><p className="text-sm text-muted-foreground">Escolha o que deseja fazer</p></div>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+        {buttons.map((b) => {
+          const Icon = b.icon;
+          return (
+            <Item key={b.slug} to={b.slug} active={false} onNav={() => {}}
+              className="flex flex-col items-center justify-center gap-3 rounded-xl border bg-card p-6 text-center text-sm font-semibold shadow-sm transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-md">
+              <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary"><Icon className="h-6 w-6" /></div>
+              {b.label}
+            </Item>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function FullDashboard() {
   const [open, setOpen] = useState<Widget | null>(null);
   const total = DAILY.reduce((a, d) => a + d.faturamento, 0);
   return (
