@@ -57,7 +57,7 @@ function Produtos() {
       const nova = [...l];
       nfe.itens.forEach((it, i) => {
         const idx = nova.findIndex((p) => p.codigo && p.codigo === it.codigo);
-        if (idx >= 0) nova[idx] = { ...nova[idx], estoque: nova[idx].estoque + it.quantidade };
+        if (idx >= 0) { const p = nova[idx]!; nova[idx] = { ...p, estoque: p.estoque + it.quantidade }; }
         else nova.unshift({ id: Date.now() + i, codigo: it.codigo, nome: it.nome, categoria: nfeCat, marca: nfe.fornecedor,
           preco: Math.round(it.valorUnit * fator * 100) / 100, estoque: it.quantidade, minimo: 0 });
       });
