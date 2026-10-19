@@ -21,14 +21,7 @@ export const Route = createFileRoute("/_authenticated/produtos")({
 type Produto = { id: number; codigo: string; nome: string; categoria: string; marca: string; preco: number; estoque: number; minimo: number };
 
 const CATEGORIAS = ["Armação", "Óculos de sol", "Lente de contato", "Acessório", "Solução"];
-const INICIAIS: Produto[] = [
-  { id: 1, codigo: "ARM-001", nome: "Armação Ray-Ban RX5154", categoria: "Armação", marca: "Ray-Ban", preco: 689.9, estoque: 5, minimo: 3 },
-  { id: 2, codigo: "ARM-002", nome: "Armação Oakley OX8046", categoria: "Armação", marca: "Oakley", preco: 749, estoque: 1, minimo: 3 },
-  { id: 3, codigo: "SOL-001", nome: "Óculos Ray-Ban Aviator", categoria: "Óculos de sol", marca: "Ray-Ban", preco: 899, estoque: 8, minimo: 2 },
-  { id: 4, codigo: "LC-001", nome: "Acuvue Oasys cx 6", categoria: "Lente de contato", marca: "Johnson", preco: 219.9, estoque: 14, minimo: 10 },
-  { id: 5, codigo: "ACE-001", nome: "Estojo rígido preto", categoria: "Acessório", marca: "Genérico", preco: 25, estoque: 4, minimo: 20 },
-  { id: 6, codigo: "SLU-001", nome: "Solução multiuso Renu 355ml", categoria: "Solução", marca: "Bausch+Lomb", preco: 39.9, estoque: 22, minimo: 10 },
-];
+const INICIAIS: Produto[] = [];
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const VAZIO = { codigo: "", nome: "", categoria: "Armação", marca: "", preco: "", estoque: "", minimo: "" };

@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Printer, FileBarChart } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useFiliais, brl } from "@/lib/filiais";
+import { useFiliais, brl, pctMeta } from "@/lib/filiais";
 
 export const Route = createFileRoute("/_authenticated/filiais_/relatorio")({
   head: () => ({
@@ -29,7 +29,7 @@ function Relatorio() {
   const linhas: [string, (f: (typeof lista)[number]) => string, string][] = [
     ["Faturamento", (f) => brl(f.faturamento), brl(total)],
     ["Meta mensal", (f) => brl(f.meta), brl(soma("meta"))],
-    ["Atingimento da meta", (f) => `${Math.round((f.faturamento / f.meta) * 100)}%`, `${Math.round((total / soma("meta")) * 100)}%`],
+    ["Atingimento da meta", (f) => `${pctMeta(f.faturamento, f.meta)}%`, `${pctMeta(total, soma("meta"))}%`],
     ["Participação no faturamento", (f) => `${Math.round((f.faturamento / total) * 100)}%`, "100%"],
     ["Vendas", (f) => String(f.vendas), String(soma("vendas"))],
     ["Ticket médio", (f) => brl(f.vendas ? f.faturamento / f.vendas : 0), brl(soma("vendas") ? total / soma("vendas") : 0)],

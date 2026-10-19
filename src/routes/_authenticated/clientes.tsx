@@ -20,12 +20,7 @@ export const Route = createFileRoute("/_authenticated/clientes")({
 
 type Cliente = { id: number; nome: string; cpf: string; telefone: string; email: string; nascimento: string; cidade: string };
 
-const INICIAIS: Cliente[] = [
-  { id: 1, nome: "Mariana Souza", cpf: "123.456.789-00", telefone: "(11) 98765-4321", email: "mariana@email.com", nascimento: "1990-03-12", cidade: "São Paulo" },
-  { id: 2, nome: "Carlos Mendes", cpf: "987.654.321-00", telefone: "(11) 91234-5678", email: "carlos@email.com", nascimento: "1985-10-18", cidade: "Guarulhos" },
-  { id: 3, nome: "Fernanda Lima", cpf: "456.789.123-00", telefone: "(11) 99876-1234", email: "fernanda@email.com", nascimento: "1978-07-05", cidade: "Osasco" },
-  { id: 4, nome: "João Pereira", cpf: "321.654.987-00", telefone: "(11) 97654-3210", email: "joao@email.com", nascimento: "1995-01-22", cidade: "São Paulo" },
-];
+const INICIAIS: Cliente[] = [];
 
 const VAZIO = { nome: "", cpf: "", telefone: "", email: "", nascimento: "", cidade: "" };
 const CAMPOS: [keyof typeof VAZIO, string, string][] = [

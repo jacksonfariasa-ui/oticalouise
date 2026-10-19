@@ -20,17 +20,7 @@ export const Route = createFileRoute("/_authenticated/otica-zap")({
 
 const STATUS = ["Ver todas", "Na fila de envio", "Enviadas", "Entregues", "Sem WhatsApp", "Bloqueado pelo cliente", "Visualizadas", "Canceladas", "Erro"];
 const TIPOS = ["Todos", "Aniversário", "Pós-venda", "O.S. pronta", "Receita vencida", "Cobrança"];
-const MSGS = [
-  { cliente: "Mariana Souza", tel: "(11) 98877-1122", tipo: "O.S. pronta", status: "Visualizadas", data: "2026-10-17" },
-  { cliente: "Carlos Mendes", tel: "(11) 97766-2233", tipo: "Aniversário", status: "Entregues", data: "2026-10-17" },
-  { cliente: "Fernanda Lima", tel: "(21) 99654-8811", tipo: "Pós-venda", status: "Enviadas", data: "2026-10-16" },
-  { cliente: "João Pereira", tel: "(31) 3344-5566", tipo: "Cobrança", status: "Sem WhatsApp", data: "2026-10-16" },
-  { cliente: "Ana Beatriz Rocha", tel: "(11) 91234-5678", tipo: "Receita vencida", status: "Na fila de envio", data: "2026-10-17" },
-  { cliente: "Roberto Alves", tel: "(19) 98111-4455", tipo: "Cobrança", status: "Bloqueado pelo cliente", data: "2026-10-14" },
-  { cliente: "Patrícia Gomes", tel: "(11) 95544-3322", tipo: "Pós-venda", status: "Erro", data: "2026-10-15" },
-  { cliente: "Lucas Martins", tel: "(41) 99887-6655", tipo: "Aniversário", status: "Canceladas", data: "2026-10-13" },
-  { cliente: "Juliana Castro", tel: "(11) 96655-7788", tipo: "O.S. pronta", status: "Entregues", data: "2026-10-15" },
-];
+const MSGS: { cliente: string; tel: string; tipo: string; status: string; data: string }[] = [];
 
 function OticaZap() {
   const [status, setStatus] = useState("Ver todas");

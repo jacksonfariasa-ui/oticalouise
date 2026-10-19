@@ -40,22 +40,7 @@ let seq = 100;
 const L = (tipo: string, fornecedor: string, nome: string, material: string, indice: string, faixa: string, custo: number, preco: number): Lente =>
   ({ id: seq++, tipo, fornecedor, nome, material, indice, faixa, custo, preco });
 
-const INICIAIS: Lente[] = [
-  L("lentes-monofocais", "Essilor", "Orma Crizal Sapphire", "Resina", "1.50", "-6,00 a +4,00", 210, 590),
-  L("lentes-monofocais", "Essilor", "Stylis Crizal Prevencia", "Resina", "1.67", "-10,00 a +6,00", 420, 1190),
-  L("lentes-monofocais", "Zeiss", "ClearView DuraVision Platinum", "Resina", "1.60", "-8,00 a +6,00", 380, 1050),
-  L("lentes-monofocais", "Hoya", "Hilux Meiryo", "Policarbonato", "1.59", "-8,00 a +6,00", 190, 520),
-  L("lentes-multifocais", "Essilor", "Varilux Comfort Max", "Resina", "1.50", "Adição +0,75 a +3,50", 690, 1890),
-  L("lentes-multifocais", "Essilor", "Varilux X Series", "Resina", "1.67", "Adição +0,75 a +3,50", 1350, 3790),
-  L("lentes-multifocais", "Zeiss", "SmartLife Progressive", "Resina", "1.60", "Adição +0,75 a +3,00", 1180, 3290),
-  L("lentes-multifocais", "Hoya", "iD MyStyle V+", "Resina", "1.60", "Adição +0,75 a +3,50", 1240, 3490),
-  L("lentes-de-contato", "Johnson & Johnson", "Acuvue Oasys (cx 6)", "Silicone hidrogel", "-", "-12,00 a +8,00", 110, 219.9),
-  L("lentes-de-contato", "Alcon", "Air Optix Plus HydraGlyde (cx 6)", "Silicone hidrogel", "-", "-10,00 a +6,00", 105, 209.9),
-  L("lentes-de-contato", "Bausch + Lomb", "SofLens Tóricas (cx 6)", "Hidrogel", "-", "-9,00 a +6,00", 120, 249.9),
-  L("tratamentos", "Essilor", "Crizal Sapphire HR", "-", "-", "Antirreflexo", 120, 390),
-  L("tratamentos", "Essilor", "Transitions Gen S", "-", "-", "Fotossensível", 260, 790),
-  L("tratamentos", "Zeiss", "BlueGuard", "-", "-", "Filtro de luz azul", 140, 450),
-];
+const INICIAIS: Lente[] = [];
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
