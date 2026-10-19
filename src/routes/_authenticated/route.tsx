@@ -6,7 +6,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/lib/auth";
 import { canAccess, roleLabel, slugFromPath } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
-import { useEmpresa, ThemeFromEmpresa } from "@/lib/empresa";
+import { useEmpresa } from "@/lib/empresa";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
