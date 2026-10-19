@@ -266,7 +266,7 @@ function RealizarVenda() {
                 }} />
               </label>
               <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-accent">
-                <Camera className="h-4 w-4" />Tirar foto
+                <Camera className="h-4 w-4" />{lendoReceita ? "Lendo receita..." : "Tirar foto"}
                 <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => {
                   const file = e.target.files?.[0]; e.target.value = "";
                   if (!file) return;
