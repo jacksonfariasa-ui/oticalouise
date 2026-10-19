@@ -1,3 +1,4 @@
+import { registrarAtividade } from "@/lib/atividades";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Save, Store } from "lucide-react";
@@ -44,6 +45,7 @@ export function FiliaisConfig() {
     if (!f) return;
     const { error } = await supabase.from("filiais_info").upsert({ ...f, updated_at: new Date().toISOString() });
     if (error) return setMsg("Erro ao salvar: " + error.message);
+    registrarAtividade(`Filiais: alterou os dados de ${f.nome}`);
     updateFilial(f.id, (x) => ({ ...x, ...f }));
     await qc.invalidateQueries({ queryKey: ["filiais_info"] });
     setMsg("Filial salva.");

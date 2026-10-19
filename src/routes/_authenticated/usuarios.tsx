@@ -1,3 +1,4 @@
+import { registrarAtividade } from "@/lib/atividades";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -41,7 +42,7 @@ function Usuarios() {
   const [open, setOpen] = useState(false);
   const [erro, setErro] = useState("");
   const refresh = () => qc.invalidateQueries({ queryKey: ["usuarios"] });
-  const run = useMutation({ mutationFn: (f: () => Promise<unknown>) => f(), onSuccess: refresh, onError: (e: Error) => setErro(e.message) });
+  const run = useMutation({ mutationFn: (f: () => Promise<unknown>) => f(), onSuccess: () => { registrarAtividade("Usuários: alterou usuários ou permissões"); return refresh(); }, onError: (e: Error) => setErro(e.message) });
 
   const porFilial = FILIAIS_OPCOES.map((f) => ({ ...f, n: users.filter((u) => u.filial === f.id).length }));
   const semFilial = users.filter((u) => u.role && exigeFilial(u.role) && !u.filial).length;
