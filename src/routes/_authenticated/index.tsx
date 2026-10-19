@@ -28,8 +28,8 @@ export const Route = createFileRoute("/_authenticated/")({
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const DAILY = Array.from({ length: 17 }, (_, i) => ({
   dia: `${String(i + 1).padStart(2, "0")}/10`,
-  faturamento: Math.round(3200 + Math.sin(i / 2) * 1400 + ((i * 937) % 1800)),
-  despesas: Math.round(1500 + Math.cos(i / 3) * 600 + ((i * 431) % 700)),
+  faturamento: 0,
+  despesas: 0,
 }));
 
 type Widget = {
@@ -38,26 +38,26 @@ type Widget = {
 };
 
 const WIDGETS: Widget[] = [
-  { title: "Contas a Pagar em Aberto", icon: ArrowDownCircle, tone: "destructive", value: brl(18430.5), sub: "7 vencem nesta semana · 2 vencidas",
-    rows: ["Fornecedor Lentes Essilor — R$ 6.200,00 — vence 20/10", "Aluguel da loja — R$ 4.500,00 — vence 05/11", "Armações Ray-Ban — R$ 5.120,50 — vencida 14/10", "Energia elétrica — R$ 610,00 — vence 22/10"] },
-  { title: "Contas Rateadas em Aberto", icon: Split, tone: "warning", value: brl(3260), sub: "4 rateios entre filiais",
-    rows: ["Marketing digital — Matriz/Filial 1 — R$ 1.800,00", "Software de gestão — R$ 860,00", "Contabilidade — R$ 600,00"] },
-  { title: "Contas a Receber em Aberto", icon: ArrowUpCircle, tone: "success", value: brl(42780.9), sub: "38 parcelas · 5 em atraso",
-    rows: ["Mariana Souza — parcela 3/6 — R$ 280,00", "Carlos Mendes — parcela 1/10 — R$ 159,90", "Fernanda Lima — boleto — R$ 1.240,00 (atrasado)"] },
-  { title: "Remover Clientes do SPC / Pagar Contas", icon: ShieldAlert, tone: "destructive", value: "3 clientes", sub: "Quitaram débitos e aguardam baixa", action: "Ver clientes",
-    rows: ["João Pereira — quitado em 12/10", "Roberto Alves — quitado em 15/10", "Sandra Nunes — quitado em 16/10"] },
-  { title: "Aniversariantes da Semana", icon: Cake, tone: "primary", value: "12 clientes", sub: "Ideal para campanha de relacionamento",
-    rows: ["Carlos Mendes — 18/10", "Lucas Martins — 19/10", "Beatriz Ramos — 21/10", "Paulo Henrique — 22/10"] },
-  { title: "Pós-Vendas do Dia", icon: PhoneCall, tone: "primary", value: "15 contatos", stats: [["No prazo", 9], ["Último dia", 4], ["Atrasados", 2]], action: "Ver Pós-Vendas",
-    rows: ["Fernanda Lima — adaptação multifocal (no prazo)", "Patrícia Gomes — lente de contato (último dia)", "Diego Faria — armação nova (atrasado)"] },
-  { title: "Receitas Vencidas", icon: FileWarning, tone: "warning", value: "27 receitas", sub: "9 vencem nos próximos 30 dias",
-    rows: ["Ana Beatriz Rocha — venceu 02/10", "Marcos Vieira — vence 30/10", "Helena Duarte — venceu 21/09"] },
-  { title: "Ordens de Serviço a Entregar", icon: Truck, tone: "primary", value: "21 O.S.", stats: [["Hoje", 5], ["Esta semana", 11], ["Atrasadas", 5]],
-    rows: ["O.S. 10482 — Mariana Souza — pronta", "O.S. 10490 — Juliana Castro — no laboratório", "O.S. 10471 — Rafael Teixeira — atrasada"] },
-  { title: "Validade de Produtos", icon: CalendarClock, tone: "warning", value: "18 itens", stats: [["Vencidos", 6], ["A vencer", 12]], action: "Listar Produtos",
-    rows: ["Solução multiuso Renu 355ml — vencida", "Lente Acuvue Oasys cx 6 — vence 11/2026", "Colírio lubrificante — vence 12/2026"] },
-  { title: "Produtos Abaixo do Estoque Mínimo", icon: PackageMinus, tone: "destructive", value: "34", sub: "produtos precisam de reposição", action: "Listar Produtos",
-    rows: ["Armação Oakley OX8046 — 1 un (mín. 3)", "Estojo rígido preto — 4 un (mín. 20)", "Flanela microfibra — 12 un (mín. 50)"] },
+  { title: "Contas a Pagar em Aberto", icon: ArrowDownCircle, tone: "destructive", value: brl(0),
+    rows: [] },
+  { title: "Contas Rateadas em Aberto", icon: Split, tone: "warning", value: brl(0),
+    rows: [] },
+  { title: "Contas a Receber em Aberto", icon: ArrowUpCircle, tone: "success", value: brl(0),
+    rows: [] },
+  { title: "Remover Clientes do SPC / Pagar Contas", icon: ShieldAlert, tone: "destructive", value: "0 clientes", action: "Ver clientes",
+    rows: [] },
+  { title: "Aniversariantes da Semana", icon: Cake, tone: "primary", value: "0 clientes",
+    rows: [] },
+  { title: "Pós-Vendas do Dia", icon: PhoneCall, tone: "primary", value: "0 contatos", stats: [["No prazo", 0], ["Último dia", 0], ["Atrasados", 0]], action: "Ver Pós-Vendas",
+    rows: [] },
+  { title: "Receitas Vencidas", icon: FileWarning, tone: "warning", value: "0 receitas",
+    rows: [] },
+  { title: "Ordens de Serviço a Entregar", icon: Truck, tone: "primary", value: "0 O.S.", stats: [["Hoje", 0], ["Esta semana", 0], ["Atrasadas", 0]],
+    rows: [] },
+  { title: "Validade de Produtos", icon: CalendarClock, tone: "warning", value: "0 itens", stats: [["Vencidos", 0], ["A vencer", 0]], action: "Listar Produtos",
+    rows: [] },
+  { title: "Produtos Abaixo do Estoque Mínimo", icon: PackageMinus, tone: "destructive", value: "34", action: "Listar Produtos",
+    rows: [] },
 ];
 
 const TONE = {
@@ -105,7 +105,7 @@ function FullDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-2">
-        <div><h1 className="text-2xl font-bold">Painel de Informações</h1><p className="text-sm text-muted-foreground">Ótica Visão Clara · Outubro de 2026</p></div>
+        <div><h1 className="text-2xl font-bold">Painel de Informações</h1><p className="text-sm text-muted-foreground">{empresa.nome}</p></div>
         <Button asChild variant="outline"><Link to="/otica-zap">Abrir Ótica Zap</Link></Button>
       </div>
       <Card className="p-5">

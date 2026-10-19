@@ -48,7 +48,7 @@ const EXEMPLOS: Documento[] = [];
 function RealizarVenda() {
   const { nome } = useAuth();
   const [docs, setDocs] = useState<Documento[]>(EXEMPLOS);
-  const [seq, setSeq] = useState({ ped: 1043, orc: 319 });
+  const [seq, setSeq] = useState({ ped: 1, orc: 1 });
   const [clienteId, setClienteId] = useState<number>(0);
   const [busca, setBusca] = useState("");
   const [itens, setItens] = useState<ItemVenda[]>([]);
