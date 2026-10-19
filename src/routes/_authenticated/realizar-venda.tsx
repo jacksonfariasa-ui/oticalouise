@@ -1,7 +1,7 @@
 import { printElement } from "@/lib/print";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { FileText, Minus, Plus, Printer, Search, ShoppingBag, Trash2, Eye, ArrowRightLeft, Paperclip, X } from "lucide-react";
+import { Camera, FileText, Minus, Plus, Printer, Search, ShoppingBag, Trash2, Eye, ArrowRightLeft, Paperclip, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -187,6 +187,16 @@ function RealizarVenda() {
                   if (!/\.(jpe?g|pdf)$/i.test(file.name)) return setErro("A receita deve ser um arquivo JPG ou PDF.");
                   if (file.size > 10 * 1024 * 1024) return setErro("Arquivo muito grande (máximo 10 MB).");
                   setErro(""); setAnexo({ nome: file.name, tipo: file.type || (file.name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg"), url: URL.createObjectURL(file) });
+                }} />
+              </label>
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-accent">
+                <Camera className="h-4 w-4" />Tirar foto
+                <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => {
+                  const file = e.target.files?.[0]; e.target.value = "";
+                  if (!file) return;
+                  if (!file.type.startsWith("image/")) return setErro("A foto deve ser uma imagem.");
+                  if (file.size > 10 * 1024 * 1024) return setErro("Foto muito grande (máximo 10 MB).");
+                  setErro(""); setAnexo({ nome: file.name || "foto-receita.jpg", tipo: file.type, url: URL.createObjectURL(file) });
                 }} />
               </label>
               {anexo && (
