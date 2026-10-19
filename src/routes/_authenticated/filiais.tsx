@@ -44,7 +44,7 @@ function Filiais() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-bold">Filiais</h1>
-        <p className="text-sm text-muted-foreground">Visão consolidada e detalhada das unidades da Ótica Louise · Outubro/2026</p>
+        <p className="text-sm text-muted-foreground">Visão consolidada e detalhada das unidades da Ótica Louise · {new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}</p>
       </header>
 
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -100,13 +100,13 @@ function Filiais() {
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold">Faturamento mensal (R$ mil)</h3>
+            <h3 className="mb-3 text-sm font-semibold">Faturamento mensal</h3>
             <div className="flex h-40 items-end gap-3">
               {sel.mensal.map((v, i) => {
                 const max = Math.max(1, ...sel.mensal);
                 return (
                   <div key={i} className="flex flex-1 flex-col items-center gap-1">
-                    <span className="text-[10px] text-muted-foreground">{v}</span>
+                    <span className="text-[10px] text-muted-foreground">{brl(v)}</span>
                     <div className="w-full rounded-t bg-primary/80" style={{ height: `${(v / max) * 110}px` }} />
                     <span className="text-xs text-muted-foreground">{MESES[i]}</span>
                   </div>

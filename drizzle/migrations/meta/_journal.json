@@ -57,6 +57,13 @@
       "when": 1792436393327,
       "tag": "0007_dados_salvos",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792439755440,
+      "tag": "0008_equipe_filiais",
+      "breakpoints": true
     }
   ]
 }
