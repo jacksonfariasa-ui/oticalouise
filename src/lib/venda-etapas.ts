@@ -40,8 +40,8 @@ export async function distribuirVenda(v: VendaEtapas) {
     recebidoAgora > 0 ? add("fluxo-de-caixa", [{ data: v.data, descricao: `Venda ${v.numero} · ${v.cliente}`, tipo: "Entrada", valor: recebidoAgora }]) : null,
     contas.length ? add("contas-a-receber", contas) : null,
     editar("produtos", (l) => l.map((p) => {
-      const q = v.itens.filter((i) => i.codigo === String(p.codigo || `P${p.id}`)).reduce((s, i) => s + i.qtd, 0);
-      return q ? { ...p, estoque: Math.max(0, Number(p.estoque) - q) } : p;
+      const q = v.itens.filter((i) => i.codigo === String(p["codigo"] || `P${p["id"]}`)).reduce((s, i) => s + i.qtd, 0);
+      return q ? { ...p, estoque: Math.max(0, Number(p["estoque"]) - q) } : p;
     })),
   ]);
 }
