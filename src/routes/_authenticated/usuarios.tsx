@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Building2, KeyRound, Plus, ShieldCheck, Trash2, X } from "lucide-react";
+import { Building2, KeyRound, Plus, ShieldCheck, Trash2, Users, X } from "lucide-react";
 import { displayLogin } from "@/lib/username";
 import { createUser, deleteUser, listUsers, resetUserPassword, setUserAcessos, setUserFilial, setUserRole } from "@/lib/users.functions";
 import { ROLES, canAccess, grantableSlugs, roleLabel, type Role } from "@/lib/permissions";
@@ -80,6 +80,8 @@ function Usuarios() {
           ))}
         </div>
       </div>
+
+      <RegistroEquipe users={visiveis} selfId={session?.user.id} />
 
       {erro && <p className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">{erro}</p>}
 
@@ -257,5 +259,65 @@ function Acessos({ nome, role, atual, onClose, onSave }: { nome: string; role: R
         </div>
       </div>
     </div>
+  );
+}
+
+type Membro = { id: string; nome: string; email: string; role: string | null; filial: string | null; created_at: string; ultimo_acesso: string | null };
+const TOM_PERFIL: Record<string, string> = {
+  admin: "bg-primary/10 text-primary", gerente: "bg-success/10 text-success",
+  vendedor: "bg-warning/15 text-warning", tecnico: "bg-muted text-muted-foreground",
+};
+const iniciais = (n: string) => n.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join("") || "?";
+const dataBR = (d: string | null) => (d ? new Date(d).toLocaleDateString("pt-BR") : "—");
+
+function RegistroEquipe({ users, selfId }: { users: Membro[]; selfId?: string | undefined }) {
+  const [busca, setBusca] = useState("");
+  const q = busca.trim().toLowerCase();
+  const lista = [...users].sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .filter((u) => !q || u.nome.toLowerCase().includes(q) || roleLabel(u.role as Role).toLowerCase().includes(q));
+  const novo = (d: string) => Date.now() - new Date(d).getTime() < 7 * 864e5;
+  return (
+    <section className="space-y-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="flex items-center gap-2 font-semibold"><Users className="h-4 w-4" />Registro da equipe</h2>
+          <p className="text-xs text-muted-foreground">Todo usuário cadastrado aparece aqui automaticamente, do mais recente ao mais antigo.</p>
+        </div>
+        <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por nome ou perfil" aria-label="Buscar na equipe"
+          className="w-full rounded-md border bg-background px-3 py-2 text-sm sm:w-64" />
+      </div>
+      {lista.length === 0 ? (
+        <div className="rounded-xl border border-dashed bg-card p-8 text-center text-sm text-muted-foreground">Nenhum membro encontrado. Use “Novo usuário” para cadastrar a equipe.</div>
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {lista.map((u) => {
+            const filial = FILIAIS_OPCOES.find((f) => f.id === u.filial)?.nome;
+            return (
+              <article key={u.id} className="rounded-xl border bg-card p-4 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary text-sm font-bold text-primary-foreground">{iniciais(u.nome)}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="truncate font-semibold">{u.nome}</h3>
+                      {u.id === selfId && <span className="text-xs text-muted-foreground">(você)</span>}
+                      {novo(u.created_at) && <span className="rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-success">Novo</span>}
+                    </div>
+                    <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${u.role ? TOM_PERFIL[u.role] ?? "" : "bg-destructive/10 text-destructive"}`}>
+                      {u.role ? roleLabel(u.role as Role) : "Aguardando liberação"}
+                    </span>
+                  </div>
+                </div>
+                <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+                  <div><dt className="text-muted-foreground">Login</dt><dd className="truncate font-medium">{displayLogin(u.email)}</dd></div>
+                  <div><dt className="text-muted-foreground">Filial</dt><dd className="truncate font-medium">{filial ?? "Todas"}</dd></div>
+                  <div><dt className="text-muted-foreground">Cadastrado em</dt><dd className="font-medium">{dataBR(u.created_at)}</dd></div>
+                  <div><dt className="text-muted-foreground">Último acesso</dt><dd className="font-medium">{u.ultimo_acesso ? dataBR(u.ultimo_acesso) : "Nunca entrou"}</dd></div>
+                </dl>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </section>
   );
 }
