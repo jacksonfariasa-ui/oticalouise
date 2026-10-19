@@ -9,6 +9,7 @@ import { ROLES, canAccess, grantableSlugs, roleLabel, type Role } from "@/lib/pe
 import { NAV } from "@/lib/nav";
 import { useAuth } from "@/lib/auth";
 import { FILIAIS_OPCOES, exigeFilial } from "@/lib/filiais";
+import { EmpresaConfig } from "@/components/EmpresaConfig";
 
 export const Route = createFileRoute("/_authenticated/usuarios")({
   head: () => ({
@@ -49,6 +50,7 @@ function Usuarios() {
 
   return (
     <div className="space-y-6">
+      <EmpresaConfig />
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Usuários e permissões</h1>

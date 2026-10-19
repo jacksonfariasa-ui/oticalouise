@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { canAccess, roleLabel } from "@/lib/permissions";
 import { supabase } from "@/integrations/supabase/client";
 import { InstallApp } from "@/components/InstallApp";
-import logo from "@/assets/otica-louise.jpg.asset.json";
+import { useEmpresa } from "@/lib/empresa";
 
 const FILIAIS = ["matriz", "rorainopolis", "pintolandia"];
 const LENTES = ["lentes-monofocais", "lentes-multifocais", "lentes-de-contato", "tratamentos"];
@@ -37,6 +37,7 @@ export function AppSidebar({ onNav }: { onNav: () => void }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { role, nome, acessos } = useAuth();
+  const empresa = useEmpresa();
   const [open, setOpen] = useState<string | null>(null);
   const isActive = (slug: string) =>
     slug === "" ? pathname === "/"
@@ -58,8 +59,8 @@ export function AppSidebar({ onNav }: { onNav: () => void }) {
   return (
     <nav className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-2 border-b border-sidebar-border px-5 py-5">
-        <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full ring-2 ring-sidebar-border"><img src={logo.url} alt="Logo Ótica Louise" className="h-full w-full rounded-full object-cover" /></div>
-        <div className="min-w-0"><div className="truncate font-bold leading-tight">Ótica Louise</div><div className="text-xs opacity-60">Gestão para óticas</div></div>
+        <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full ring-2 ring-sidebar-border"><img src={empresa.logo} alt={`Logo ${empresa.nome}`} className="h-full w-full rounded-full object-cover" /></div>
+        <div className="min-w-0"><div className="truncate font-bold leading-tight">{empresa.nome}</div><div className="text-xs opacity-60">Gestão para óticas</div></div>
       </div>
       <ul className="flex-1 space-y-0.5 overflow-y-auto p-3">
         {items.map((n) => {
