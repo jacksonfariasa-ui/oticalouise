@@ -12,6 +12,7 @@ import { Item } from "@/components/AppSidebar";
 import { NAV } from "@/lib/nav";
 import { useAuth } from "@/lib/auth";
 import { canAccess } from "@/lib/permissions";
+import { useEmpresa } from "@/lib/empresa";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -56,7 +57,7 @@ const WIDGETS: Widget[] = [
     rows: [] },
   { title: "Validade de Produtos", icon: CalendarClock, tone: "warning", value: "0 itens", stats: [["Vencidos", 0], ["A vencer", 0]], action: "Listar Produtos",
     rows: [] },
-  { title: "Produtos Abaixo do Estoque Mínimo", icon: PackageMinus, tone: "destructive", value: "34", action: "Listar Produtos",
+  { title: "Produtos Abaixo do Estoque Mínimo", icon: PackageMinus, tone: "destructive", value: "0", action: "Listar Produtos",
     rows: [] },
 ];
 
@@ -100,6 +101,7 @@ function SellerHome() {
 }
 
 function FullDashboard() {
+  const empresa = useEmpresa();
   const [open, setOpen] = useState<Widget | null>(null);
   const total = DAILY.reduce((a, d) => a + d.faturamento, 0);
   return (
@@ -150,7 +152,7 @@ function FullDashboard() {
       <Dialog open={!!open} onOpenChange={(o) => !o && setOpen(null)}>
         <DialogContent>
           <DialogHeader><DialogTitle>{open?.title}</DialogTitle></DialogHeader>
-          <ul className="divide-y text-sm">{open?.rows.map((r) => <li key={r} className="py-2">{r}</li>)}</ul>
+          {open?.rows.length ? <ul className="divide-y text-sm">{open.rows.map((r) => <li key={r} className="py-2">{r}</li>)}</ul> : <p className="text-sm text-muted-foreground">Nenhum registro no momento.</p>}
         </DialogContent>
       </Dialog>
     </div>
