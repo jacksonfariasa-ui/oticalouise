@@ -143,6 +143,9 @@ function RealizarVenda() {
     const novo: Documento = { ...doc, numero, tipo: "Pedido", data: hoje(), validade: "", entrega: somarDias(hoje(), 7), obs: `${doc.obs ? doc.obs + " · " : ""}Gerado a partir do ${doc.numero}` };
     setDocs((d) => [novo, ...d]);
     void registrar(novo);
+    distribuirVenda({ ...novo, cliente: novo.cliente.nome })
+      .then(() => toast.success("Venda lançada em Vendas, O.S., Financeiro e Estoque."))
+      .catch(() => toast.error("Não foi possível lançar a venda em todas as etapas."));
     setVisualizar(novo);
   }
 
