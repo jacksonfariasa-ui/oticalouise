@@ -44,7 +44,7 @@ function Filiais() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-bold">Filiais</h1>
-        <p className="text-sm text-muted-foreground">Visão consolidada e detalhada das unidades da Ótica Louise · Outubro/2026</p>
+        <p className="text-sm text-muted-foreground">Visão consolidada e detalhada das unidades da Ótica Louise · {new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}</p>
       </header>
 
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
