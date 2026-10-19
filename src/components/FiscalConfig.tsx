@@ -68,7 +68,7 @@ export function FiscalConfig() {
           <div className="text-xs text-muted-foreground">Ambiente</div>
           <div className="mt-2 flex gap-1 rounded-md bg-muted p-1 text-sm">
             {[["homologacao", "Teste"], ["producao", "Produção"]].map(([v, l]) => (
-              <button key={v} onClick={() => set("ambiente", v)} className={`flex-1 rounded px-2 py-1 font-medium ${f["ambiente"] === v ? "bg-background shadow-sm" : "text-muted-foreground"}`}>{l}</button>
+              <button key={v} onClick={() => set("ambiente", v ?? "")} className={`flex-1 rounded px-2 py-1 font-medium ${f["ambiente"] === v ? "bg-background shadow-sm" : "text-muted-foreground"}`}>{l}</button>
             ))}
           </div>
         </div>

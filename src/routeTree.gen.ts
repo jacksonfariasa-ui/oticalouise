@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedFiliaisRouteImport } from './routes/_authenticated/filiais'
+import { Route as AuthenticatedNotasFiscaisRouteImport } from './routes/_authenticated/notas-fiscais'
 import { Route as AuthenticatedOticaZapRouteImport } from './routes/_authenticated/otica-zap'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
 import { Route as AuthenticatedPromocoesRouteImport } from './routes/_authenticated/promocoes'
@@ -54,6 +55,12 @@ const AuthenticatedFiliaisRoute = AuthenticatedFiliaisRouteImport.update({
   path: '/filiais',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotasFiscaisRoute =
+  AuthenticatedNotasFiscaisRouteImport.update({
+    id: '/notas-fiscais',
+    path: '/notas-fiscais',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOticaZapRoute = AuthenticatedOticaZapRouteImport.update({
   id: '/otica-zap',
   path: '/otica-zap',
@@ -108,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/filiais': typeof AuthenticatedFiliaisRoute
+  '/notas-fiscais': typeof AuthenticatedNotasFiscaisRoute
   '/otica-zap': typeof AuthenticatedOticaZapRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/promocoes': typeof AuthenticatedPromocoesRoute
@@ -123,6 +131,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/filiais': typeof AuthenticatedFiliaisRoute
+  '/notas-fiscais': typeof AuthenticatedNotasFiscaisRoute
   '/otica-zap': typeof AuthenticatedOticaZapRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/promocoes': typeof AuthenticatedPromocoesRoute
@@ -141,6 +150,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/filiais': typeof AuthenticatedFiliaisRoute
+  '/_authenticated/notas-fiscais': typeof AuthenticatedNotasFiscaisRoute
   '/_authenticated/otica-zap': typeof AuthenticatedOticaZapRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/promocoes': typeof AuthenticatedPromocoesRoute
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/clientes'
     | '/filiais'
+    | '/notas-fiscais'
     | '/otica-zap'
     | '/produtos'
     | '/promocoes'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/clientes'
     | '/filiais'
+    | '/notas-fiscais'
     | '/otica-zap'
     | '/produtos'
     | '/promocoes'
@@ -192,6 +204,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/clientes'
     | '/_authenticated/filiais'
+    | '/_authenticated/notas-fiscais'
     | '/_authenticated/otica-zap'
     | '/_authenticated/produtos'
     | '/_authenticated/promocoes'
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/filiais'
       fullPath: '/filiais'
       preLoaderRoute: typeof AuthenticatedFiliaisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notas-fiscais': {
+      id: '/_authenticated/notas-fiscais'
+      path: '/notas-fiscais'
+      fullPath: '/notas-fiscais'
+      preLoaderRoute: typeof AuthenticatedNotasFiscaisRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/otica-zap': {
@@ -323,6 +343,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedFiliaisRoute: typeof AuthenticatedFiliaisRoute
+  AuthenticatedNotasFiscaisRoute: typeof AuthenticatedNotasFiscaisRoute
   AuthenticatedOticaZapRoute: typeof AuthenticatedOticaZapRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedPromocoesRoute: typeof AuthenticatedPromocoesRoute
@@ -338,6 +359,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedFiliaisRoute: AuthenticatedFiliaisRoute,
+  AuthenticatedNotasFiscaisRoute: AuthenticatedNotasFiscaisRoute,
   AuthenticatedOticaZapRoute: AuthenticatedOticaZapRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedPromocoesRoute: AuthenticatedPromocoesRoute,
