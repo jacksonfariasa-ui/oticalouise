@@ -1,7 +1,7 @@
 import { printElement } from "@/lib/print";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { FileText, Minus, Plus, Printer, Search, ShoppingBag, Trash2, Eye, ArrowRightLeft } from "lucide-react";
+import { FileText, Minus, Plus, Printer, Search, ShoppingBag, Trash2, Eye, ArrowRightLeft, Paperclip, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,6 +51,7 @@ type Documento = {
   numero: string; tipo: "Pedido" | "Orçamento"; data: string; validade: string; cliente: Cliente; vendedor: string;
   itens: ItemVenda[]; desconto: Desconto; pagamento: string; parcelas: number; entrada: number;
   receita: { od: Olho; oe: Olho }; entrega: string; obs: string;
+  anexo?: { nome: string; tipo: string; url: string } | undefined;
 };
 
 const hoje = () => new Date().toISOString().slice(0, 10);
@@ -86,6 +87,7 @@ function RealizarVenda() {
   const [oe, setOe] = useState<Olho>(OLHO);
   const [entrega, setEntrega] = useState(somarDias(hoje(), 7));
   const [obs, setObs] = useState("");
+  const [anexo, setAnexo] = useState<Documento["anexo"]>();
   const [erro, setErro] = useState("");
   const [visualizar, setVisualizar] = useState<Documento | null>(null);
 
@@ -108,7 +110,7 @@ function RealizarVenda() {
 
   function limpar() {
     setClienteId(0); setItens([]); setDesconto({ tipo: "percentual", valor: 0 }); setPagamento("PIX"); setParcelas(1);
-    setEntrada(0); setOd(OLHO); setOe(OLHO); setEntrega(somarDias(hoje(), 7)); setObs(""); setErro("");
+    setEntrada(0); setOd(OLHO); setOe(OLHO); setEntrega(somarDias(hoje(), 7)); setObs(""); setErro(""); setAnexo(undefined);
   }
 
   function emitir(tipo: Documento["tipo"]) {
@@ -118,7 +120,7 @@ function RealizarVenda() {
     setSeq((s) => (tipo === "Pedido" ? { ...s, ped: s.ped + 1 } : { ...s, orc: s.orc + 1 }));
     const doc: Documento = {
       numero, tipo, data: hoje(), validade: tipo === "Orçamento" ? somarDias(hoje(), 10) : "", cliente, vendedor: nome || "Vendedor",
-      itens, desconto, pagamento, parcelas: parcelavel ? parcelas : 1, entrada, receita: { od, oe }, entrega: tipo === "Pedido" ? entrega : "", obs,
+      itens, desconto, pagamento, parcelas: parcelavel ? parcelas : 1, entrada, receita: { od, oe }, entrega: tipo === "Pedido" ? entrega : "", obs, anexo,
     };
     setDocs((d) => [doc, ...d]);
     limpar();
@@ -202,6 +204,24 @@ function RealizarVenda() {
                   ))}
                 </tbody>
               </table>
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-t pt-4">
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-accent">
+                <Paperclip className="h-4 w-4" />{anexo ? "Trocar arquivo" : "Anexar receita (JPG ou PDF)"}
+                <input type="file" accept=".jpg,.jpeg,.pdf,image/jpeg,application/pdf" className="hidden" onChange={(e) => {
+                  const file = e.target.files?.[0]; e.target.value = "";
+                  if (!file) return;
+                  if (!/\.(jpe?g|pdf)$/i.test(file.name)) return setErro("A receita deve ser um arquivo JPG ou PDF.");
+                  if (file.size > 10 * 1024 * 1024) return setErro("Arquivo muito grande (máximo 10 MB).");
+                  setErro(""); setAnexo({ nome: file.name, tipo: file.type || (file.name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg"), url: URL.createObjectURL(file) });
+                }} />
+              </label>
+              {anexo && (
+                <span className="inline-flex items-center gap-2 text-sm">
+                  <a href={anexo.url} target="_blank" rel="noreferrer" className="text-primary underline">{anexo.nome}</a>
+                  <button aria-label="Remover anexo" onClick={() => setAnexo(undefined)} className="rounded p-1 hover:bg-accent"><X className="h-4 w-4" /></button>
+                </span>
+              )}
             </div>
           </Card>
         </div>
@@ -322,6 +342,12 @@ function DocumentoImpresso({ doc }: { doc: Documento }) {
             ))}
           </tbody>
         </table>
+      )}
+      {doc.anexo && (
+        <div className="space-y-2">
+          <div className="text-xs text-muted-foreground">Receita anexada: <a href={doc.anexo.url} target="_blank" rel="noreferrer" className="text-primary underline">{doc.anexo.nome}</a></div>
+          {doc.anexo.tipo.startsWith("image/") && <img src={doc.anexo.url} alt="Receita anexada" className="max-h-96 rounded border object-contain" />}
+        </div>
       )}
 
       <div className="ml-auto max-w-xs space-y-1">
