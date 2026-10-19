@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ACCEPT, imagemDataUrl, isImagem, readTableFile } from "@/lib/import-table";
 import { lerImagemLentes } from "@/lib/lentes-ocr.functions";
+import { VARILUX } from "@/lib/lentes-varilux";
 
 const TIPOS: Record<string, string> = {
   "lentes-monofocais": "Lentes Monofocais",
