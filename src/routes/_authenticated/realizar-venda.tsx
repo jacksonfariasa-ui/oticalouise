@@ -1,4 +1,5 @@
 import { printElement } from "@/lib/print";
+import { distribuirVenda } from "@/lib/venda-etapas";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -130,6 +131,9 @@ function RealizarVenda() {
     };
     setDocs((d) => [doc, ...d]);
     void registrar(doc);
+    if (tipo === "Pedido") distribuirVenda({ ...doc, cliente: cliente.nome })
+      .then(() => toast.success("Venda lançada em Vendas, O.S., Financeiro e Estoque."))
+      .catch(() => toast.error("Não foi possível lançar a venda em todas as etapas."));
     limpar();
     setVisualizar(doc);
   }
@@ -140,6 +144,9 @@ function RealizarVenda() {
     const novo: Documento = { ...doc, numero, tipo: "Pedido", data: hoje(), validade: "", entrega: somarDias(hoje(), 7), obs: `${doc.obs ? doc.obs + " · " : ""}Gerado a partir do ${doc.numero}` };
     setDocs((d) => [novo, ...d]);
     void registrar(novo);
+    distribuirVenda({ ...novo, cliente: novo.cliente.nome })
+      .then(() => toast.success("Venda lançada em Vendas, O.S., Financeiro e Estoque."))
+      .catch(() => toast.error("Não foi possível lançar a venda em todas as etapas."));
     setVisualizar(novo);
   }
 
