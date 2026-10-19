@@ -50,6 +50,13 @@
       "when": 1792433015717,
       "tag": "0006_clientes_e_vendas",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792436393327,
+      "tag": "0007_dados_salvos",
+      "breakpoints": true
     }
   ]
 }

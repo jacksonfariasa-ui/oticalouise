@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { usePersistedList } from "@/lib/persisted";
 import { useMemo, useRef, useState } from "react";
 import { Download, FileUp, Plus, Search, Trash2, Upload } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -56,7 +57,7 @@ const VAZIO: Record<Campo, string> = { fornecedor: "", nome: "", material: "", i
 function Lentes() {
   const { tipo } = Route.useParams();
   const titulo = TIPOS[tipo] ?? "Tabelas de Lentes";
-  const [lista, setLista] = useState<Lente[]>(INICIAIS);
+  const [lista, setLista] = usePersistedList<Lente>(`lentes:${tipo}`, INICIAIS);
   const [busca, setBusca] = useState("");
   const [novo, setNovo] = useState(false);
   const [form, setForm] = useState(VAZIO);

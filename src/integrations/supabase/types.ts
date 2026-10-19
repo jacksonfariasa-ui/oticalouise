@@ -88,6 +88,27 @@ export type Database = {
         }
         Relationships: []
       }
+      dados_salvos: {
+        Row: {
+          chave: string
+          dados: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          chave: string
+          dados?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          chave?: string
+          dados?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       empresa_config: {
         Row: {
           cnpj: string
