@@ -19,10 +19,10 @@ import { useEmpresa } from "@/lib/empresa";
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
-      { title: "Painel de Informações — Ótica Louise" },
-      { name: "description", content: "Painel gerencial da ótica: faturamento, contas, pós-vendas, O.S. e estoque." },
-      { property: "og:title", content: "Painel de Informações — Ótica Louise" },
-      { property: "og:description", content: "Painel gerencial da ótica: faturamento, contas, pós-vendas, O.S. e estoque." },
+      { title: "Início — Ótica Louise" },
+      { name: "description", content: "Atalhos para as áreas do sistema da ótica." },
+      { property: "og:title", content: "Início — Ótica Louise" },
+      { property: "og:description", content: "Atalhos para as áreas do sistema da ótica." },
     ],
   }),
   component: Dashboard,
@@ -72,16 +72,15 @@ const TONE = {
 
 function Dashboard() {
   const { role } = useAuth();
-  if (role === "vendedor") return <SellerHome />;
-  return <FullDashboard />;
+  return <SellerHome />;
 }
 
 function SellerHome() {
-  const { nome, acessos } = useAuth();
+  const { nome, acessos, role } = useAuth();
   const buttons = NAV.flatMap((n) =>
     n.children
-      ? n.children.filter((c) => canAccess("vendedor", c.slug, acessos)).map((c) => ({ label: c.label, slug: c.slug, icon: n.icon }))
-      : n.slug && canAccess("vendedor", n.slug, acessos) ? [{ label: n.label, slug: n.slug, icon: n.icon }] : [],
+      ? n.children.filter((c) => canAccess(role, c.slug, acessos)).map((c) => ({ label: c.label, slug: c.slug, icon: n.icon }))
+      : n.slug && canAccess(role, n.slug, acessos) ? [{ label: n.label, slug: n.slug, icon: n.icon }] : [],
   );
   return (
     <div className="space-y-6">
@@ -98,6 +97,7 @@ function SellerHome() {
           );
         })}
       </div>
+      {(role === "admin" || role === "gerente") && <Atividades />}
     </div>
   );
 }
