@@ -1,7 +1,7 @@
 import { printElement } from "@/lib/print";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { FileText, Minus, Plus, Printer, Search, ShoppingBag, Trash2, Eye, ArrowRightLeft } from "lucide-react";
+import { FileText, Minus, Plus, Printer, Search, ShoppingBag, Trash2, Eye, ArrowRightLeft, Paperclip, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
