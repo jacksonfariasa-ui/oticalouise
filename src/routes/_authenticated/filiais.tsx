@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { useFiliais, updateFilial, brl, MESES, STATUS_CLS, type Filial } from "@/lib/filiais";
+import { useFiliais, updateFilial, brl, MESES, STATUS_CLS, type Filial, pctMeta } from "@/lib/filiais";
 
 export const Route = createFileRoute("/_authenticated/filiais")({
   head: () => ({
@@ -32,7 +32,7 @@ function Filiais() {
   const totalVendas = lista.reduce((a, f) => a + f.vendas, 0);
   const totalOS = lista.reduce((a, f) => a + f.osAbertas, 0);
   const totalEquipe = lista.reduce((a, f) => a + f.equipe.length, 0);
-  const ranking = [...lista].sort((a, b) => b.faturamento / b.meta - a.faturamento / a.meta);
+  const ranking = [...lista].sort((a, b) => pctMeta(b.faturamento, b.meta) - pctMeta(a.faturamento, a.meta));
 
   function salvar() {
     if (!edit) return;
@@ -56,7 +56,7 @@ function Filiais() {
 
       <section className="grid gap-4 md:grid-cols-3">
         {lista.map((f) => {
-          const pct = Math.round((f.faturamento / f.meta) * 100);
+          const pct = pctMeta(f.faturamento, f.meta);
           return (
             <button key={f.id} onClick={() => setSelId(f.id)}
               className={cn("rounded-xl border bg-card p-5 text-left transition hover:border-primary", selId === f.id && "border-primary ring-2 ring-primary/30")}>
@@ -103,7 +103,7 @@ function Filiais() {
             <h3 className="mb-3 text-sm font-semibold">Faturamento mensal (R$ mil)</h3>
             <div className="flex h-40 items-end gap-3">
               {sel.mensal.map((v, i) => {
-                const max = Math.max(...sel.mensal);
+                const max = Math.max(1, ...sel.mensal);
                 return (
                   <div key={i} className="flex flex-1 flex-col items-center gap-1">
                     <span className="text-[10px] text-muted-foreground">{v}</span>
@@ -134,7 +134,7 @@ function Filiais() {
               {ranking.map((f, i) => (
                 <li key={f.id} className="flex items-center justify-between text-sm">
                   <span>{i + 1}º {f.nome}</span>
-                  <span className="font-semibold">{Math.round((f.faturamento / f.meta) * 100)}%</span>
+                  <span className="font-semibold">{pctMeta(f.faturamento, f.meta)}%</span>
                 </li>
               ))}
             </ol>

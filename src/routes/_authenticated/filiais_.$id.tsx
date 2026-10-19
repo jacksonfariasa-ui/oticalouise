@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useFiliais, updateFilial, brl } from "@/lib/filiais";
+import { useFiliais, updateFilial, brl, pctMeta } from "@/lib/filiais";
 import { useAuth } from "@/lib/auth";
 import { roleLabel } from "@/lib/permissions";
 
@@ -82,7 +82,7 @@ function Unidade() {
     });
   }
 
-  const pct = Math.round((f.faturamento / f.meta) * 100);
+  const pct = pctMeta(f.faturamento, f.meta);
   const minhas = f.vendasLista.filter((v) => v.vendedor === nome);
   const meuTotal = minhas.reduce((a, v) => a + v.valor, 0);
   const porVendedor = Object.entries(f.vendasLista.reduce<Record<string, { qtd: number; total: number }>>((acc, v) => {

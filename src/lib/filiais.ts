@@ -70,3 +70,6 @@ export const FILIAIS_OPCOES = BASE.map((f) => ({ id: f.id, nome: f.nome }));
 export const filialNome = (id?: string | null) => FILIAIS_OPCOES.find((f) => f.id === id)?.nome ?? null;
 export const ROLES_COM_FILIAL = ["gerente", "vendedor"] as const;
 export const exigeFilial = (role: string) => (ROLES_COM_FILIAL as readonly string[]).includes(role);
+
+/** Goal achievement in %, 0 when no goal is set (avoids NaN/Infinity). */
+export const pctMeta = (feito: number, meta: number) => (meta > 0 ? Math.round((feito / meta) * 100) : 0);
