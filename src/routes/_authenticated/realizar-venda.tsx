@@ -14,6 +14,16 @@ import { useAuth } from "@/lib/auth";
 import { brl, calcularTotais, valorParcela, type Desconto, type ItemVenda } from "@/lib/venda";
 import { VARILUX } from "@/lib/lentes-varilux";
 import logo from "@/assets/otica-louise.jpg.asset.json";
+import { lerReceita } from "@/lib/receita-ocr.functions";
+
+async function reduzirImagem(file: File, max = 1600): Promise<string> {
+  const bmp = await createImageBitmap(file);
+  const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  const cv = document.createElement("canvas");
+  cv.width = Math.round(bmp.width * s); cv.height = Math.round(bmp.height * s);
+  cv.getContext("2d")!.drawImage(bmp, 0, 0, cv.width, cv.height);
+  return cv.toDataURL("image/jpeg", 0.85);
+}
 
 export const Route = createFileRoute("/_authenticated/realizar-venda")({
   head: () => ({
@@ -97,6 +107,20 @@ function RealizarVenda() {
   const [entrega, setEntrega] = useState(somarDias(hoje(), 7));
   const [obs, setObs] = useState("");
   const [anexo, setAnexo] = useState<Documento["anexo"]>();
+  const [lendoReceita, setLendoReceita] = useState(false);
+  const preencherReceita = async (file: File) => {
+    setLendoReceita(true);
+    const t = toast.loading("Lendo a receita...");
+    try {
+      const imagem = await reduzirImagem(file);
+      const r = await lerReceita({ data: { imagem } });
+      const juntar = (atual: Olho, novo: Olho): Olho => ({ esf: novo.esf || atual.esf, cil: novo.cil || atual.cil, eixo: novo.eixo || atual.eixo, adicao: novo.adicao || atual.adicao, dnp: novo.dnp || atual.dnp });
+      setOd((a) => juntar(a, r.od)); setOe((a) => juntar(a, r.oe));
+      toast.success("Receita preenchida. Confira os valores.", { id: t });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Não foi possível ler a receita.", { id: t });
+    } finally { setLendoReceita(false); }
+  };
   const [erro, setErro] = useState("");
   const [visualizar, setVisualizar] = useState<Documento | null>(null);
 
@@ -242,13 +266,14 @@ function RealizarVenda() {
                 }} />
               </label>
               <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-accent">
-                <Camera className="h-4 w-4" />Tirar foto
+                <Camera className="h-4 w-4" />{lendoReceita ? "Lendo receita..." : "Tirar foto"}
                 <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => {
                   const file = e.target.files?.[0]; e.target.value = "";
                   if (!file) return;
                   if (!file.type.startsWith("image/")) return setErro("A foto deve ser uma imagem.");
                   if (file.size > 10 * 1024 * 1024) return setErro("Foto muito grande (máximo 10 MB).");
                   setErro(""); setAnexo({ nome: file.name || "foto-receita.jpg", tipo: file.type, url: URL.createObjectURL(file) });
+                  void preencherReceita(file);
                 }} />
               </label>
               {anexo && (
