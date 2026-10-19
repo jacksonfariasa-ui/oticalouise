@@ -4,8 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Building2, KeyRound, Plus, ShieldCheck, Trash2, X } from "lucide-react";
 import { displayLogin } from "@/lib/username";
-import { createUser, deleteUser, listUsers, resetUserPassword, setUserFilial, setUserRole } from "@/lib/users.functions";
-import { ROLES, canAccess, roleLabel, type Role } from "@/lib/permissions";
+import { createUser, deleteUser, listUsers, resetUserPassword, setUserAcessos, setUserFilial, setUserRole } from "@/lib/users.functions";
+import { ROLES, canAccess, grantableSlugs, roleLabel, type Role } from "@/lib/permissions";
 import { NAV } from "@/lib/nav";
 import { useAuth } from "@/lib/auth";
 import { FILIAIS_OPCOES, exigeFilial } from "@/lib/filiais";
@@ -33,8 +33,10 @@ function Usuarios() {
   const reset = useServerFn(resetUserPassword);
   const del = useServerFn(deleteUser);
   const setFilial = useServerFn(setUserFilial);
+  const saveAcessos = useServerFn(setUserAcessos);
   const [filtroFilial, setFiltroFilial] = useState("todas");
   const { data: users = [], isLoading } = useQuery({ queryKey: ["usuarios"], queryFn: () => list() });
+  const [acessoDe, setAcessoDe] = useState<(typeof users)[number] | null>(null);
   const [open, setOpen] = useState(false);
   const [erro, setErro] = useState("");
   const refresh = () => qc.invalidateQueries({ queryKey: ["usuarios"] });
@@ -107,6 +109,7 @@ function Usuarios() {
                   <td className="p-3 text-muted-foreground">{u.ultimo_acesso ? new Date(u.ultimo_acesso).toLocaleString("pt-BR") : "Nunca"}</td>
                   <td className="p-3">
                     <div className="flex justify-end gap-1">
+                      {u.role !== "admin" && <button title="Escolher acessos" onClick={() => { setErro(""); setAcessoDe(u); }} className="rounded p-2 text-primary hover:bg-accent"><ShieldCheck className="h-4 w-4" /></button>}
                       <button title="Definir nova senha" onClick={() => { const s = prompt(`Nova senha para ${u.nome} :`); if (s) { setErro(""); run.mutate(() => reset({ data: { userId: u.id, senha: s } })); } }} className="rounded p-2 hover:bg-accent"><KeyRound className="h-4 w-4" /></button>
                       {!self && <button title="Excluir" onClick={() => { if (confirm(`Excluir ${u.nome}?`)) { setErro(""); run.mutate(() => del({ data: { userId: u.id } })); } }} className="rounded p-2 text-destructive hover:bg-accent"><Trash2 className="h-4 w-4" /></button>}
                     </div>
@@ -140,6 +143,10 @@ function Usuarios() {
         </div>
       </div>
 
+      {acessoDe && acessoDe.role && (
+        <Acessos nome={acessoDe.nome} role={acessoDe.role as Role} atual={acessoDe.acessos ?? null} onClose={() => setAcessoDe(null)}
+          onSave={async (acessos) => { await saveAcessos({ data: { userId: acessoDe.id, acessos } }); refresh(); }} />
+      )}
       {open && <NovoUsuario onClose={() => setOpen(false)} onSave={async (d) => { await create({ data: d }); refresh(); }} />}
     </div>
   );
@@ -186,6 +193,66 @@ function NovoUsuario({ onClose, onSave }: { onClose: () => void; onSave: (d: { n
         <p className="text-xs text-muted-foreground">Perfil escolhido: {roleLabel(f.role)}. Entregue o nome e a senha à pessoa; ela já pode entrar.</p>
         <button disabled={busy} className="w-full rounded-md bg-primary py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60">{busy ? "Salvando…" : "Criar usuário"}</button>
       </form>
+    </div>
+  );
+}
+
+function Acessos({ nome, role, atual, onClose, onSave }: { nome: string; role: Role; atual: string[] | null; onClose: () => void; onSave: (a: string[] | null) => Promise<void> }) {
+  const todos = grantableSlugs(NAV);
+  const padrao = todos.filter((s) => canAccess(role, s));
+  const [sel, setSel] = useState<Set<string>>(new Set(atual ?? padrao));
+  const [busy, setBusy] = useState(false);
+  const [erro, setErro] = useState("");
+  const toggle = (s: string) => setSel((p) => { const n = new Set(p); n.has(s) ? n.delete(s) : n.add(s); return n; });
+  const grupo = (slugs: string[], on: boolean) => setSel((p) => { const n = new Set(p); slugs.forEach((s) => (on ? n.add(s) : n.delete(s))); return n; });
+  async function salvar(valor: string[] | null) {
+    setBusy(true); setErro("");
+    try { await onSave(valor); onClose(); } catch (e) { setErro((e as Error).message); } finally { setBusy(false); }
+  }
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/40 p-4" onClick={onClose}>
+      <div className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-xl border bg-card" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-start justify-between border-b p-5">
+          <div><h2 className="text-lg font-bold">Acessos de {nome}</h2><p className="text-sm text-muted-foreground">Perfil {roleLabel(role)} · {atual ? "acessos personalizados" : "usando o padrão do perfil"}</p></div>
+          <button aria-label="Fechar" onClick={onClose} className="rounded p-1 hover:bg-accent"><X className="h-5 w-5" /></button>
+        </div>
+        <div className="flex flex-wrap gap-2 border-b px-5 py-3 text-xs">
+          <button onClick={() => setSel(new Set(todos))} className="rounded-full border px-3 py-1 hover:bg-accent">Marcar tudo</button>
+          <button onClick={() => setSel(new Set())} className="rounded-full border px-3 py-1 hover:bg-accent">Desmarcar tudo</button>
+          <button onClick={() => setSel(new Set(padrao))} className="rounded-full border px-3 py-1 hover:bg-accent">Padrão do perfil</button>
+          <span className="ml-auto self-center text-muted-foreground">{sel.size} de {todos.length} áreas</span>
+        </div>
+        <div className="grid flex-1 gap-4 overflow-y-auto p-5 sm:grid-cols-2">
+          {NAV.filter((n) => n.slug && n.slug !== "administracao").map((n) => {
+            const itens = n.children ? n.children : [{ label: n.label, slug: n.slug }];
+            const Icon = n.icon;
+            const all = itens.every((c) => sel.has(c.slug));
+            return (
+              <div key={n.label} className="rounded-lg border p-3">
+                <label className="flex items-center gap-2 text-sm font-semibold">
+                  <input type="checkbox" checked={all} onChange={(e) => (n.children ? grupo(itens.map((c) => c.slug), e.target.checked) : toggle(n.slug))} className="h-4 w-4 accent-primary" />
+                  <Icon className="h-4 w-4 text-primary" />{n.label}
+                </label>
+                {n.children && (
+                  <div className="mt-2 space-y-1 pl-6">
+                    {n.children.map((c) => (
+                      <label key={c.slug} className="flex items-center gap-2 text-sm">
+                        <input type="checkbox" checked={sel.has(c.slug)} onChange={() => toggle(c.slug)} className="h-4 w-4 accent-primary" />{c.label}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {erro && <p className="px-5 text-sm text-destructive">{erro}</p>}
+        <div className="flex flex-wrap justify-end gap-2 border-t p-4">
+          {atual && <button disabled={busy} onClick={() => salvar(null)} className="mr-auto rounded-md border px-4 py-2 text-sm">Voltar ao padrão do perfil</button>}
+          <button onClick={onClose} className="rounded-md border px-4 py-2 text-sm">Cancelar</button>
+          <button disabled={busy} onClick={() => salvar([...sel])} className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">{busy ? "Salvando…" : "Salvar acessos"}</button>
+        </div>
+      </div>
     </div>
   );
 }
