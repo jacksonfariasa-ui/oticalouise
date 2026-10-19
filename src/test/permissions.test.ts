@@ -14,3 +14,11 @@ describe("permissões por perfil", () => {
   it("vendedor não acessa a visão geral das filiais", () => expect(canAccess("vendedor", "filiais")).toBe(false));
   it("sem perfil não acessa nada", () => expect(canAccess(null, "")).toBe(false));
 });
+
+describe("acessos personalizados por usuário", () => {
+  it("vendedor com acesso liberado ao financeiro entra", () => expect(canAccess("vendedor", "fluxo-de-caixa", ["fluxo-de-caixa"])).toBe(true));
+  it("vendedor sem a área marcada não entra, mesmo sendo do perfil", () => expect(canAccess("vendedor", "vendas", ["clientes"])).toBe(false));
+  it("administração nunca é liberada a não administradores", () => expect(canAccess("gerente", "administracao", ["administracao"])).toBe(false));
+  it("administrador continua com tudo", () => expect(canAccess("admin", "vendas", [])).toBe(true));
+  it("painel sempre acessível", () => expect(canAccess("tecnico", "", [])).toBe(true));
+});
