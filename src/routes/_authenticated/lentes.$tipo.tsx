@@ -73,9 +73,12 @@ function Lentes() {
     setErro("");
     if (!file) return;
     try {
-      const rows = (await readTableFile(file)).filter((r) => r.some((c) => c?.trim()));
+      let rows = (await readTableFile(file)).filter((r) => r.some((c) => c?.trim()));
+      const reconhece = (r: string[]) => r.filter((h) => COLUNAS.some((c) => c.alias.some((a) => norm(h ?? "").includes(a)))).length;
+      const ini = rows.findIndex((r) => reconhece(r) >= 2);
+      if (ini > 0) rows = rows.slice(ini);
       if (rows.length < 2) throw new Error("O arquivo precisa ter uma linha de títulos e pelo menos uma linha de dados.");
-      const mapa = (rows[0] ?? []).map((h) => COLUNAS.find((c) => c.alias.some((a) => norm(h).includes(a)))?.k ?? ("" as const));
+      const mapa = (rows[0] ?? []).map((h) => COLUNAS.find((c) => c.alias.some((a) => norm(h ?? "").includes(a)))?.k ?? ("" as const));
       setImp({ arquivo: file.name, linhas: rows, mapa });
     } catch (e) {
       setErro(e instanceof Error ? e.message : "Não foi possível ler o arquivo.");
