@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { findLabel } from "@/lib/nav";
 import { MODULES, type Mod } from "@/lib/modules";
+import { Relatorios } from "@/components/Relatorios";
 
 export const Route = createFileRoute("/_authenticated/modulo/$slug")({
   head: ({ params }) => {
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/modulo/$slug")({
 function Modulo() {
   const { slug } = Route.useParams();
   const mod = MODULES[slug];
+  if (slug === "relatorios") return <Relatorios />;
   if (!mod) {
     return (
       <div className="space-y-6">
