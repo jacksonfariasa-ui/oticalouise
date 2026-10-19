@@ -145,7 +145,7 @@ function EmitirDialog({ open, onClose, onDone }: { open: boolean; onClose: () =>
   const erro = validarNota(tipo, cliente, itens);
 
   async function enviar() {
-    if (erro) return toast.error(erro);
+    if (erro) { toast.error(erro); return; }
     setEnviando(true);
     try {
       const r = await emitir({ data: { tipo, cliente, itens, pagamento } });
