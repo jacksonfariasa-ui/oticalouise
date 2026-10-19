@@ -23,13 +23,7 @@ type Promo = { id: number; nome: string; aplicaEm: string; tipo: TipoDesc; valor
 type Status = "Ativa" | "Agendada" | "Encerrada" | "Pausada";
 
 const ALVOS = ["Todos os produtos", "Armações", "Óculos de sol", "Lentes oftálmicas", "Lentes de contato", "Acessórios"];
-const INICIAIS: Promo[] = [
-  { id: 1, nome: "Outubro Rosa — armações femininas", aplicaEm: "Armações", tipo: "percentual", valor: 20, inicio: "2026-10-01", fim: "2026-10-31", ativa: true, usos: 37 },
-  { id: 2, nome: "Multifocal com antirreflexo grátis", aplicaEm: "Lentes oftálmicas", tipo: "valor", valor: 390, inicio: "2026-09-15", fim: "2026-11-15", ativa: true, usos: 12 },
-  { id: 3, nome: "Black Friday Óculos de Sol", aplicaEm: "Óculos de sol", tipo: "percentual", valor: 35, inicio: "2026-11-20", fim: "2026-11-30", ativa: true, usos: 0 },
-  { id: 4, nome: "Dia das Crianças", aplicaEm: "Armações", tipo: "percentual", valor: 15, inicio: "2026-10-01", fim: "2026-10-12", ativa: true, usos: 24 },
-  { id: 5, nome: "Lentes de contato — 2ª caixa", aplicaEm: "Lentes de contato", tipo: "percentual", valor: 30, inicio: "2026-08-01", fim: "2026-12-31", ativa: false, usos: 41 },
-];
+const INICIAIS: Promo[] = [];
 
 const HOJE = "2026-10-17";
 const status = (p: Promo): Status => (!p.ativa ? "Pausada" : HOJE < p.inicio ? "Agendada" : HOJE > p.fim ? "Encerrada" : "Ativa");
