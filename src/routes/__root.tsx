@@ -9,6 +9,7 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "../lib/auth";
 import { ThemeFromEmpresa } from "../lib/empresa";
 
@@ -131,6 +132,7 @@ function RootComponent() {
       <AuthProvider>
         <ThemeFromEmpresa />
         <Outlet />
+        <Toaster richColors position="top-right" />
       </AuthProvider>
     </QueryClientProvider>
   );
