@@ -19,10 +19,10 @@ import { useEmpresa } from "@/lib/empresa";
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
-      { title: "Painel de Informações — Ótica Louise" },
-      { name: "description", content: "Painel gerencial da ótica: faturamento, contas, pós-vendas, O.S. e estoque." },
-      { property: "og:title", content: "Painel de Informações — Ótica Louise" },
-      { property: "og:description", content: "Painel gerencial da ótica: faturamento, contas, pós-vendas, O.S. e estoque." },
+      { title: "Início — Ótica Louise" },
+      { name: "description", content: "Atalhos para as áreas do sistema da ótica." },
+      { property: "og:title", content: "Início — Ótica Louise" },
+      { property: "og:description", content: "Atalhos para as áreas do sistema da ótica." },
     ],
   }),
   component: Dashboard,
@@ -72,16 +72,15 @@ const TONE = {
 
 function Dashboard() {
   const { role } = useAuth();
-  if (role === "vendedor") return <SellerHome />;
-  return <FullDashboard />;
+  return <SellerHome />;
 }
 
 function SellerHome() {
-  const { nome, acessos } = useAuth();
+  const { nome, acessos, role } = useAuth();
   const buttons = NAV.flatMap((n) =>
     n.children
-      ? n.children.filter((c) => canAccess("vendedor", c.slug, acessos)).map((c) => ({ label: c.label, slug: c.slug, icon: n.icon }))
-      : n.slug && canAccess("vendedor", n.slug, acessos) ? [{ label: n.label, slug: n.slug, icon: n.icon }] : [],
+      ? n.children.filter((c) => canAccess(role, c.slug, acessos)).map((c) => ({ label: c.label, slug: c.slug, icon: n.icon }))
+      : n.slug && canAccess(role, n.slug, acessos) ? [{ label: n.label, slug: n.slug, icon: n.icon }] : [],
   );
   return (
     <div className="space-y-6">
@@ -98,66 +97,7 @@ function SellerHome() {
           );
         })}
       </div>
-    </div>
-  );
-}
-
-function FullDashboard() {
-  const empresa = useEmpresa();
-  const [open, setOpen] = useState<Widget | null>(null);
-  const total = DAILY.reduce((a, d) => a + d.faturamento, 0);
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div><h1 className="text-2xl font-bold">Painel de Informações</h1><p className="text-sm text-muted-foreground">{empresa.nome}</p></div>
-        <Button asChild variant="outline"><Link to="/otica-zap">Abrir Ótica Zap</Link></Button>
-      </div>
-      <Card className="p-5">
-        <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-          <div className="font-semibold">Movimentação diária</div>
-          <div className="text-sm text-muted-foreground">Faturamento no mês: <span className="font-bold text-foreground">{brl(total)}</span></div>
-        </div>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={DAILY}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="dia" fontSize={12} stroke="var(--muted-foreground)" />
-              <YAxis fontSize={12} stroke="var(--muted-foreground)" />
-              <Tooltip formatter={(v: number) => brl(v)} />
-              <Area type="monotone" dataKey="faturamento" name="Faturamento" stroke="var(--chart-1)" fill="var(--chart-1)" fillOpacity={0.2} />
-              <Area type="monotone" dataKey="despesas" name="Despesas" stroke="var(--chart-2)" fill="var(--chart-2)" fillOpacity={0.15} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
-      <Atividades />
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {WIDGETS.map((w) => {
-          const Icon = w.icon;
-          return (
-            <Card key={w.title} role="button" tabIndex={0} onClick={() => setOpen(w)} onKeyDown={(e) => e.key === "Enter" && setOpen(w)}
-              className="cursor-pointer p-5 transition-shadow hover:shadow-md">
-              <div className="flex items-start gap-3">
-                <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg ${TONE[w.tone]}`}><Icon className="h-5 w-5" /></div>
-                <div className="min-w-0"><div className="text-sm font-medium text-muted-foreground">{w.title}</div><div className="text-2xl font-bold">{w.value}</div></div>
-              </div>
-              {w.sub && <p className="mt-3 text-sm text-muted-foreground">{w.sub}</p>}
-              {w.stats && (
-                <div className="mt-3 grid grid-cols-3 gap-2">
-                  {w.stats.map(([l, n]) => <div key={l} className="rounded-md bg-muted p-2 text-center"><div className="text-lg font-bold">{n}</div><div className="text-xs text-muted-foreground">{l}</div></div>)}
-                </div>
-              )}
-              {w.action && <Button size="sm" className="mt-4 w-full">{w.action}</Button>}
-            </Card>
-          );
-        })}
-      </div>
-      <Dialog open={!!open} onOpenChange={(o) => !o && setOpen(null)}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>{open?.title}</DialogTitle></DialogHeader>
-          {open?.rows.length ? <ul className="divide-y text-sm">{open.rows.map((r) => <li key={r} className="py-2">{r}</li>)}</ul> : <p className="text-sm text-muted-foreground">Nenhum registro no momento.</p>}
-        </DialogContent>
-      </Dialog>
+      {(role === "admin" || role === "gerente") && <Atividades />}
     </div>
   );
 }

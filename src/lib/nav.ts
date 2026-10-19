@@ -11,7 +11,7 @@ const s = (label: string) =>
 const kids = (...l: string[]) => l.map((label) => ({ label, slug: s(label) }));
 
 export const NAV: NavItem[] = [
-  { label: "Painel de Informações", slug: "", icon: LayoutDashboard },
+  { label: "Início", slug: "", icon: LayoutDashboard },
   { label: "Realizar Venda", slug: "realizar-venda", icon: ShoppingBag },
   { label: "Clientes", slug: "clientes", icon: Users },
   { label: "Produtos", slug: "produtos", icon: Package },
