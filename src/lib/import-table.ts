@@ -112,8 +112,8 @@ async function readPdf(buf: ArrayBuffer): Promise<string[][]> {
     const rows = new Map<number, { x: number; w: number; s: string }[]>();
     for (const it of items) {
       if (!it.str?.trim()) continue;
-      const y = Math.round(it.transform[5] / 3) * 3;
-      (rows.get(y) ?? rows.set(y, []).get(y)!).push({ x: it.transform[4], w: it.width, s: it.str.trim() });
+      const y = Math.round((it.transform[5] ?? 0) / 3) * 3;
+      (rows.get(y) ?? rows.set(y, []).get(y)!).push({ x: it.transform[4] ?? 0, w: it.width, s: it.str.trim() });
     }
     [...rows.entries()].sort((a, b) => b[0] - a[0]).forEach(([, cells]) => {
       cells.sort((a, b) => a.x - b.x);
