@@ -73,7 +73,10 @@ function Lentes() {
     setErro("");
     if (!file) return;
     try {
-      let rows = (await readTableFile(file)).filter((r) => r.some((c) => c?.trim()));
+      setLendo(true);
+      const bruto = isImagem(file) ? (await lerImagemLentes({ data: { imagem: await imagemDataUrl(file) } })).linhas : await readTableFile(file);
+      let rows = bruto.filter((r) => r.some((c) => c?.trim()));
+      if (isImagem(file) && rows.length < 2) throw new Error("Nenhuma lente foi encontrada na foto. Tente uma imagem mais nítida.");
       const reconhece = (r: string[]) => r.filter((h) => COLUNAS.some((c) => c.alias.some((a) => norm(h ?? "").includes(a)))).length;
       const ini = rows.findIndex((r) => reconhece(r) >= 2);
       if (ini > 0) rows = rows.slice(ini);
