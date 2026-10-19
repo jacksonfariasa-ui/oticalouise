@@ -41,7 +41,7 @@ let seq = 100;
 const L = (tipo: string, fornecedor: string, nome: string, material: string, indice: string, faixa: string, custo: number, preco: number): Lente =>
   ({ id: seq++, tipo, fornecedor, nome, material, indice, faixa, custo, preco });
 
-const INICIAIS: Lente[] = [];
+const INICIAIS: Lente[] = VARILUX.map((l) => L("lentes-multifocais", l.fornecedor, l.nome, l.material, l.indice, l.faixa, l.custo, l.preco));
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
