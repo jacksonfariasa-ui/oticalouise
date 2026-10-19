@@ -130,6 +130,9 @@ function RealizarVenda() {
     };
     setDocs((d) => [doc, ...d]);
     void registrar(doc);
+    if (tipo === "Pedido") distribuirVenda({ ...doc, cliente: cliente.nome })
+      .then(() => toast.success("Venda lançada em Vendas, O.S., Financeiro e Estoque."))
+      .catch(() => toast.error("Não foi possível lançar a venda em todas as etapas."));
     limpar();
     setVisualizar(doc);
   }
