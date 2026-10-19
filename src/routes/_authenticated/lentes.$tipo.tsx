@@ -125,6 +125,10 @@ function Lentes() {
           <h1 className="text-2xl font-bold">{titulo}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button variant="outline" disabled={!lista.some((l) => l.tipo === tipo)}
+            onClick={() => { if (confirm(`Apagar todas as lentes de ${titulo}?`)) setLista((x) => x.filter((l) => l.tipo !== tipo)); }}>
+            <Trash2 className="h-4 w-4" />Limpar tabela
+          </Button>
           <Button variant="outline" onClick={exportar}><Download className="h-4 w-4" />Exportar</Button>
           <Button variant="outline" onClick={() => fileRef.current?.click()}><Upload className="h-4 w-4" />Importar arquivo</Button>
           <Button onClick={() => setNovo(true)}><Plus className="h-4 w-4" />Nova lente</Button>
