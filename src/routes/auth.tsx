@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Lock, User } from "lucide-react";
-import logo from "@/assets/otica-louise.jpg.asset.json";
+import { useEmpresa } from "@/lib/empresa";
 import { supabase } from "@/integrations/supabase/client";
 import { ROLES } from "@/lib/permissions";
 import { loginEmail } from "@/lib/username";
@@ -48,7 +48,7 @@ function AuthPage() {
     <div className="grid min-h-screen bg-background lg:grid-cols-2">
       <div className="hidden flex-col justify-between bg-sidebar p-12 text-sidebar-foreground lg:flex">
         <div className="flex items-center gap-2">
-          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full ring-2 ring-sidebar-border"><img src={logo.url} alt="Logo Ótica Louise" className="h-full w-full rounded-full object-cover" /></div>
+          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full ring-2 ring-sidebar-border"><img src={useEmpresa().logo} alt="Logo Ótica Louise" className="h-full w-full rounded-full object-cover" /></div>
           <span className="text-lg font-bold">Ótica Louise</span>
         </div>
         <div>
@@ -68,7 +68,7 @@ function AuthPage() {
       <div className="flex items-center justify-center p-6">
         <form onSubmit={submit} className="w-full max-w-sm space-y-4">
           <div className="mb-6 flex items-center gap-2 lg:hidden">
-            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full"><img src={logo.url} alt="Logo Ótica Louise" className="h-full w-full rounded-full object-cover" /></div>
+            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full"><img src={useEmpresa().logo} alt="Logo Ótica Louise" className="h-full w-full rounded-full object-cover" /></div>
             <span className="font-bold">Ótica Louise</span>
           </div>
           <div>
