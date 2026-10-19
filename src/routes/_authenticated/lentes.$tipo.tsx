@@ -184,9 +184,24 @@ function Lentes() {
             <tbody>
               {itens.map((l) => (
                 <tr key={l.id} className="border-b last:border-0">
-                  <td className="py-2 pr-3">{l.fornecedor}</td><td className="pr-3 font-medium">{l.nome}</td><td className="pr-3">{l.material}</td>
-                  <td className="pr-3">{l.indice}</td><td className="pr-3">{l.faixa}</td>
-                  <td className="pr-3 text-right text-muted-foreground">{brl(l.custo)}</td><td className="pr-3 text-right font-semibold">{brl(l.preco)}</td>
+                  {COLUNAS.map((c) => {
+                    const dinheiro = c.k === "custo" || c.k === "preco";
+                    const v = dinheiro ? (l[c.k] as number).toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : String(l[c.k]);
+                    return (
+                      <td key={c.k} className="py-1 pr-1">
+                        <input key={`${l.id}-${c.k}-${v}`} defaultValue={v} aria-label={`${c.label} de ${l.nome}`} inputMode={dinheiro ? "decimal" : undefined}
+                          title={dinheiro ? brl(l[c.k] as number) : v}
+                          className={`h-8 w-full rounded border border-transparent bg-transparent px-2 hover:border-input focus:border-ring focus:bg-background focus:outline-none ${dinheiro ? "min-w-24 text-right" : c.k === "nome" ? "min-w-72 font-medium" : "min-w-24"} ${c.k === "preco" ? "font-semibold" : ""} ${c.k === "custo" ? "text-muted-foreground" : ""}`}
+                          onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
+                          onBlur={(e) => {
+                            const nv = e.target.value;
+                            if (nv === v) return;
+                            if (c.k === "nome" && !nv.trim()) { e.target.value = v; return; }
+                            setLista((x) => x.map((i) => (i.id === l.id ? { ...i, [c.k]: dinheiro ? num(nv) : nv } : i)));
+                          }} />
+                      </td>
+                    );
+                  })}
                   <td className="text-right"><Button size="icon" variant="ghost" aria-label={`Excluir ${l.nome}`} onClick={() => setLista((x) => x.filter((i) => i.id !== l.id))}><Trash2 className="h-4 w-4" /></Button></td>
                 </tr>
               ))}
