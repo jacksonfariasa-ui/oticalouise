@@ -12,7 +12,7 @@ async function editar(chave: string, fn: (l: Reg[]) => Reg[]) {
   const { error } = await supabase.from("dados_salvos").upsert({ chave, dados: fn(atual) as unknown as Json, updated_at: new Date().toISOString() });
   if (error) throw error;
 }
-const novoId = (l: Reg[]) => l.reduce((m, r) => Math.max(m, Number(r._id) || 0), 0) + 1;
+const novoId = (l: Reg[]) => l.reduce((m, r) => Math.max(m, Number(r["_id"]) || 0), 0) + 1;
 const add = (slug: string, linhas: Reg[]) => editar(`modulo:${findLabel(slug)}`, (l) => {
   let id = novoId(l);
   return [...linhas.map((r) => ({ _id: id++, ...r })), ...l];
