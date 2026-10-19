@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { usePersistedList } from "@/lib/persisted";
 import { useMemo, useState } from "react";
 import { Construction, Plus, Search, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -40,7 +41,7 @@ const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", curren
 const TONS = ["bg-primary/10 text-primary", "bg-success/10 text-success", "bg-warning/15 text-warning", "bg-destructive/10 text-destructive", "bg-muted text-muted-foreground"];
 
 function Tabela({ titulo, mod }: { titulo: string; mod: Mod }) {
-  const [rows, setRows] = useState<Row[]>(() => mod.linhas.map((l, i) => ({ _id: i, ...Object.fromEntries(mod.campos.map(([k], j) => [k, l[j] ?? ""])) })));
+  const [rows, setRows] = usePersistedList<Row>(`modulo:${titulo}`, () => mod.linhas.map((l, i) => ({ _id: i, ...Object.fromEntries(mod.campos.map(([k], j) => [k, l[j] ?? ""])) })));
   const [busca, setBusca] = useState("");
   const [filtro, setFiltro] = useState<string | null>(null);
   const [aberto, setAberto] = useState(false);

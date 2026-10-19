@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { usePersistedList } from "@/lib/persisted";
 import { useMemo, useState } from "react";
 import { CalendarDays, Plus, Search, Tag, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -38,7 +39,7 @@ const desc = (p: Promo) => (p.tipo === "percentual" ? `${p.valor}% OFF` : `${p.v
 const VAZIO = { nome: "", aplicaEm: ALVOS[1] ?? "", tipo: "percentual" as TipoDesc, valor: "", inicio: HOJE, fim: "" };
 
 function Promocoes() {
-  const [lista, setLista] = useState<Promo[]>(INICIAIS);
+  const [lista, setLista] = usePersistedList<Promo>("promocoes", INICIAIS);
   const [busca, setBusca] = useState("");
   const [filtro, setFiltro] = useState<Status | "Todas">("Todas");
   const [aberto, setAberto] = useState(false);

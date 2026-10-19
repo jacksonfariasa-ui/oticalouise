@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { usePersistedList } from "@/lib/persisted";
 import { useMemo, useState } from "react";
 import { FileText, Plus, Search, Trash2 } from "lucide-react";
 import { lerNfeXml, type Nfe } from "@/lib/nfe";
@@ -28,7 +29,7 @@ const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", curren
 const VAZIO = { codigo: "", nome: "", categoria: "Armação", marca: "", preco: "", estoque: "", minimo: "" };
 
 function Produtos() {
-  const [lista, setLista] = useState<Produto[]>(INICIAIS);
+  const [lista, setLista] = usePersistedList<Produto>("produtos", INICIAIS);
   const [busca, setBusca] = useState("");
   const [cat, setCat] = useState("Todas");
   const [aberto, setAberto] = useState(false);
