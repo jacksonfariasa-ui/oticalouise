@@ -73,9 +73,12 @@ function Lentes() {
     setErro("");
     if (!file) return;
     try {
-      const rows = (await readTableFile(file)).filter((r) => r.some((c) => c?.trim()));
+      let rows = (await readTableFile(file)).filter((r) => r.some((c) => c?.trim()));
+      const reconhece = (r: string[]) => r.filter((h) => COLUNAS.some((c) => c.alias.some((a) => norm(h ?? "").includes(a)))).length;
+      const ini = rows.findIndex((r) => reconhece(r) >= 2);
+      if (ini > 0) rows = rows.slice(ini);
       if (rows.length < 2) throw new Error("O arquivo precisa ter uma linha de títulos e pelo menos uma linha de dados.");
-      const mapa = (rows[0] ?? []).map((h) => COLUNAS.find((c) => c.alias.some((a) => norm(h).includes(a)))?.k ?? ("" as const));
+      const mapa = (rows[0] ?? []).map((h) => COLUNAS.find((c) => c.alias.some((a) => norm(h ?? "").includes(a)))?.k ?? ("" as const));
       setImp({ arquivo: file.name, linhas: rows, mapa });
     } catch (e) {
       setErro(e instanceof Error ? e.message : "Não foi possível ler o arquivo.");
@@ -151,7 +154,7 @@ function Lentes() {
         className={`cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-colors ${arrastando ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"}`}>
         <FileUp className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
         <p className="text-sm font-medium">Arraste sua tabela aqui ou clique para escolher</p>
-        <p className="text-xs text-muted-foreground">Aceita Excel (.xlsx), Word (.docx), CSV, TXT, TSV e HTML. A primeira linha deve conter os títulos das colunas.</p>
+        <p className="text-xs text-muted-foreground">Aceita PDF, PowerPoint (.pptx), Excel (.xlsx), Word (.docx), CSV, TXT, TSV e HTML. A primeira linha da tabela deve conter os títulos das colunas.</p>
         <input ref={fileRef} type="file" accept={ACCEPT} className="hidden" onChange={(e) => abrirArquivo(e.target.files?.[0])} />
       </div>
       {erro && <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{erro}</p>}

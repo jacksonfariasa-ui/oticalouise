@@ -77,13 +77,67 @@ function readHtml(txt: string): string[][] {
   return Array.from(doc.querySelectorAll("tr")).map((tr) => Array.from(tr.querySelectorAll("td,th")).map((c) => c.textContent?.trim() ?? ""));
 }
 
-export const ACCEPT = ".xlsx,.csv,.txt,.tsv,.docx,.html,.htm,.xml";
+async function readPptx(buf: ArrayBuffer): Promise<string[][]> {
+  const f = await unzip(buf);
+  const slides = [...f.keys()].filter((k) => /^ppt\/slides\/slide\d+\.xml$/.test(k))
+    .sort((a, b) => Number(a.match(/\d+/)![0]) - Number(b.match(/\d+/)![0]));
+  const text = (el: Element) => byTag(el, "t").map((t) => t.textContent).join(" ").trim();
+  const tables: string[][] = [];
+  const lines: string[] = [];
+  let header: string | null = null;
+  for (const s of slides) {
+    const doc = xml(f.get(s));
+    const trs = byTag(doc, "tr");
+    if (trs.length) {
+      trs.forEach((tr, i) => {
+        const row = byTag(tr, "tc").map(text);
+        const key = row.join("|").toLowerCase();
+        if (i === 0) { if (header === key) return; if (header === null) header = key; }
+        tables.push(row);
+      });
+    } else byTag(doc, "p").forEach((p) => { const t = text(p); if (t) lines.push(t); });
+  }
+  return tables.length ? tables : splitText(lines.join("\n"));
+}
+
+async function readPdf(buf: ArrayBuffer): Promise<string[][]> {
+  const pdfjs = await import("pdfjs-dist");
+  const worker = await import("pdfjs-dist/build/pdf.worker.min.mjs?url");
+  pdfjs.GlobalWorkerOptions.workerSrc = worker.default;
+  const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf) }).promise;
+  const out: string[] = [];
+  for (let n = 1; n <= pdf.numPages; n++) {
+    const page = await pdf.getPage(n);
+    const items = (await page.getTextContent()).items as { str: string; transform: number[]; width: number }[];
+    const rows = new Map<number, { x: number; w: number; s: string }[]>();
+    for (const it of items) {
+      if (!it.str?.trim()) continue;
+      const y = Math.round((it.transform[5] ?? 0) / 3) * 3;
+      (rows.get(y) ?? rows.set(y, []).get(y)!).push({ x: it.transform[4] ?? 0, w: it.width, s: it.str.trim() });
+    }
+    [...rows.entries()].sort((a, b) => b[0] - a[0]).forEach(([, cells]) => {
+      cells.sort((a, b) => a.x - b.x);
+      let line = "", end = -1;
+      for (const c of cells) {
+        line += end < 0 ? c.s : c.x - end > 8 ? "\t" + c.s : " " + c.s;
+        end = c.x + c.w;
+      }
+      out.push(line);
+    });
+  }
+  const lines = out.filter((l) => l.trim());
+  return lines.map((l) => l.split("\t").map((c) => c.trim()));
+}
+
+export const ACCEPT = ".xlsx,.csv,.txt,.tsv,.docx,.pptx,.pdf,.html,.htm,.xml";
 
 export async function readTableFile(file: File): Promise<string[][]> {
   const ext = file.name.split(".").pop()?.toLowerCase();
-  if (ext === "xls" || ext === "doc") throw new Error("Formato antigo do Office. Salve como .xlsx ou .docx e tente novamente.");
+  if (ext === "xls" || ext === "doc" || ext === "ppt") throw new Error("Formato antigo do Office. Salve como .xlsx, .docx ou .pptx e tente novamente.");
   if (ext === "xlsx") return readXlsx(await file.arrayBuffer());
   if (ext === "docx") return readDocx(await file.arrayBuffer());
+  if (ext === "pptx") return readPptx(await file.arrayBuffer());
+  if (ext === "pdf") return readPdf(await file.arrayBuffer());
   const txt = await file.text();
   if (ext === "html" || ext === "htm" || ext === "xml") return readHtml(txt);
   return splitText(txt);
