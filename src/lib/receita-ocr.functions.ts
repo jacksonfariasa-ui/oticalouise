@@ -52,7 +52,7 @@ export const lerReceita = createServerFn({ method: "POST" })
     }
     const m = txt.match(/\{[\s\S]*\}/);
     const r = m ? JSON.parse(m[0]) : {};
-    const limpar = (o: Record<string, unknown> | undefined) => ({
+    const limpar = (o: { esf?: unknown; cil?: unknown; eixo?: unknown; adicao?: unknown; dnp?: unknown } | undefined) => ({
       esf: String(o?.esf ?? ""), cil: String(o?.cil ?? ""), eixo: String(o?.eixo ?? "").replace(/[°º]/g, ""), adicao: String(o?.adicao ?? ""), dnp: String(o?.dnp ?? ""),
     });
     return { od: limpar(r.od), oe: limpar(r.oe) };
