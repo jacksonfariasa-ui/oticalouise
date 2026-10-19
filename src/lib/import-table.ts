@@ -129,7 +129,19 @@ async function readPdf(buf: ArrayBuffer): Promise<string[][]> {
   return lines.map((l) => l.split("\t").map((c) => c.trim()));
 }
 
-export const ACCEPT = ".xlsx,.csv,.txt,.tsv,.docx,.pptx,.pdf,.html,.htm,.xml";
+export const ACCEPT = ".xlsx,.csv,.txt,.tsv,.docx,.pptx,.pdf,.html,.htm,.xml,.jpg,.jpeg,.png,.webp";
+
+export const isImagem = (f: File) => f.type.startsWith("image/") || /\.(jpe?g|png|webp)$/i.test(f.name);
+
+// Reduz a imagem e devolve data URL JPEG.
+export async function imagemDataUrl(file: File, max = 2000): Promise<string> {
+  const bmp = await createImageBitmap(file);
+  const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
+  c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", 0.85);
+}
 
 export async function readTableFile(file: File): Promise<string[][]> {
   const ext = file.name.split(".").pop()?.toLowerCase();
