@@ -1,6 +1,8 @@
 import { printElement } from "@/lib/print";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Camera, FileText, Minus, Plus, Printer, Search, ShoppingBag, Trash2, Eye, ArrowRightLeft, Paperclip, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,8 +24,7 @@ export const Route = createFileRoute("/_authenticated/realizar-venda")({
   component: RealizarVenda,
 });
 
-type Cliente = { id: number; nome: string; cpf: string; telefone: string };
-const CLIENTES: Cliente[] = [];
+type Cliente = { id: string; nome: string; cpf: string; telefone: string };
 
 const CATALOGO: { codigo: string; descricao: string; grupo: string; preco: number }[] = [];
 
@@ -49,7 +50,20 @@ function RealizarVenda() {
   const { nome } = useAuth();
   const [docs, setDocs] = useState<Documento[]>(EXEMPLOS);
   const [seq, setSeq] = useState({ ped: 1, orc: 1 });
-  const [clienteId, setClienteId] = useState<number>(0);
+  const [clienteId, setClienteId] = useState<string>("");
+  const [CLIENTES, setClientes] = useState<Cliente[]>([]);
+  useEffect(() => {
+    supabase.from("clientes").select("id,nome,cpf,telefone").order("nome").then(({ data }) => setClientes(data ?? []));
+  }, []);
+  async function registrar(doc: Documento) {
+    const { anexo, ...resto } = doc;
+    const { error } = await supabase.from("cliente_vendas").insert({
+      cliente_id: doc.cliente.id, numero: doc.numero, tipo: doc.tipo, total: calcularTotais(doc.itens, doc.desconto).total,
+      dados: JSON.parse(JSON.stringify({ ...resto, anexo: anexo ? { nome: anexo.nome, tipo: anexo.tipo } : null })),
+    });
+    if (error) toast.error("Não foi possível salvar no cadastro do cliente.");
+    else toast.success(`${doc.tipo} ${doc.numero} salvo no cadastro de ${doc.cliente.nome}.`);
+  }
   const [busca, setBusca] = useState("");
   const [itens, setItens] = useState<ItemVenda[]>([]);
   const [desconto, setDesconto] = useState<Desconto>({ tipo: "percentual", valor: 0 });
@@ -82,7 +96,7 @@ function RealizarVenda() {
   const alterar = (id: string, patch: Partial<ItemVenda>) => setItens((l) => l.map((i) => (i.id === id ? { ...i, ...patch } : i)));
 
   function limpar() {
-    setClienteId(0); setItens([]); setDesconto({ tipo: "percentual", valor: 0 }); setPagamento("PIX"); setParcelas(1);
+    setClienteId(""); setItens([]); setDesconto({ tipo: "percentual", valor: 0 }); setPagamento("PIX"); setParcelas(1);
     setEntrada(0); setOd(OLHO); setOe(OLHO); setEntrega(somarDias(hoje(), 7)); setObs(""); setErro(""); setAnexo(undefined);
   }
 
@@ -96,6 +110,7 @@ function RealizarVenda() {
       itens, desconto, pagamento, parcelas: parcelavel ? parcelas : 1, entrada, receita: { od, oe }, entrega: tipo === "Pedido" ? entrega : "", obs, anexo,
     };
     setDocs((d) => [doc, ...d]);
+    void registrar(doc);
     limpar();
     setVisualizar(doc);
   }
@@ -105,6 +120,7 @@ function RealizarVenda() {
     setSeq((s) => ({ ...s, ped: s.ped + 1 }));
     const novo: Documento = { ...doc, numero, tipo: "Pedido", data: hoje(), validade: "", entrega: somarDias(hoje(), 7), obs: `${doc.obs ? doc.obs + " · " : ""}Gerado a partir do ${doc.numero}` };
     setDocs((d) => [novo, ...d]);
+    void registrar(novo);
     setVisualizar(novo);
   }
 
@@ -122,8 +138,8 @@ function RealizarVenda() {
         <div className="min-w-0 space-y-6">
           <Card className="p-5">
             <h2 className="mb-3 font-semibold">1. Cliente</h2>
-            <select className={sel} value={clienteId} onChange={(e) => setClienteId(Number(e.target.value))}>
-              <option value={0}>Selecione o cliente…</option>
+            <select className={sel} value={clienteId} onChange={(e) => setClienteId(e.target.value)}>
+              <option value="">Selecione o cliente…</option>
               {CLIENTES.map((c) => <option key={c.id} value={c.id}>{c.nome} — {c.cpf}</option>)}
             </select>
             {cliente && <p className="mt-2 text-sm text-muted-foreground">Telefone: {cliente.telefone}</p>}
