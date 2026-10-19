@@ -29,6 +29,13 @@
       "when": 1792429627334,
       "tag": "0003_protect_profiles_acessos",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792431126172,
+      "tag": "0004_empresa_config",
+      "breakpoints": true
     }
   ]
 }

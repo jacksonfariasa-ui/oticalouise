@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      empresa_config: {
+        Row: {
+          cnpj: string
+          cor_primaria: string | null
+          email: string
+          endereco: string
+          id: number
+          logo_url: string | null
+          nome: string
+          slogan: string
+          telefone: string
+          updated_at: string
+        }
+        Insert: {
+          cnpj?: string
+          cor_primaria?: string | null
+          email?: string
+          endereco?: string
+          id?: number
+          logo_url?: string | null
+          nome?: string
+          slogan?: string
+          telefone?: string
+          updated_at?: string
+        }
+        Update: {
+          cnpj?: string
+          cor_primaria?: string | null
+          email?: string
+          endereco?: string
+          id?: number
+          logo_url?: string | null
+          nome?: string
+          slogan?: string
+          telefone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           acessos: string[] | null
