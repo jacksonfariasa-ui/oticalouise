@@ -14,6 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      cliente_vendas: {
+        Row: {
+          cliente_id: string
+          created_at: string
+          created_by: string | null
+          dados: Json
+          id: string
+          numero: string
+          tipo: string
+          total: number
+        }
+        Insert: {
+          cliente_id: string
+          created_at?: string
+          created_by?: string | null
+          dados?: Json
+          id?: string
+          numero: string
+          tipo: string
+          total?: number
+        }
+        Update: {
+          cliente_id?: string
+          created_at?: string
+          created_by?: string | null
+          dados?: Json
+          id?: string
+          numero?: string
+          tipo?: string
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cliente_vendas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clientes: {
+        Row: {
+          cidade: string
+          cpf: string
+          created_at: string
+          email: string
+          id: string
+          nascimento: string
+          nome: string
+          telefone: string
+        }
+        Insert: {
+          cidade?: string
+          cpf?: string
+          created_at?: string
+          email?: string
+          id?: string
+          nascimento?: string
+          nome: string
+          telefone?: string
+        }
+        Update: {
+          cidade?: string
+          cpf?: string
+          created_at?: string
+          email?: string
+          id?: string
+          nascimento?: string
+          nome?: string
+          telefone?: string
+        }
+        Relationships: []
+      }
       empresa_config: {
         Row: {
           cnpj: string

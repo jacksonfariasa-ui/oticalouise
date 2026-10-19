@@ -43,6 +43,13 @@
       "when": 1792431462350,
       "tag": "0005_filiais_info",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792433015717,
+      "tag": "0006_clientes_e_vendas",
+      "breakpoints": true
     }
   ]
 }
