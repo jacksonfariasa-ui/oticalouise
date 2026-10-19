@@ -15,6 +15,13 @@
       "when": 1792344582739,
       "tag": "0001_profiles_filial",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792429607300,
+      "tag": "0002_profiles_acessos",
+      "breakpoints": true
     }
   ]
 }

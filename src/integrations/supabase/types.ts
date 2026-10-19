@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          acessos: string[] | null
           created_at: string
           email: string
           filial: string | null
@@ -23,6 +24,7 @@ export type Database = {
           nome: string
         }
         Insert: {
+          acessos?: string[] | null
           created_at?: string
           email?: string
           filial?: string | null
@@ -30,6 +32,7 @@ export type Database = {
           nome?: string
         }
         Update: {
+          acessos?: string[] | null
           created_at?: string
           email?: string
           filial?: string | null
