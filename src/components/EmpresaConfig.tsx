@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Building2, ImageUp, RotateCcw, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { EMPRESA_PADRAO, reduzirImagem, useEmpresa, type Empresa } from "@/lib/empresa";
+import { FiliaisConfig } from "@/components/FiliaisConfig";
 import logoPadrao from "@/assets/otica-louise.jpg.asset.json";
 
 const CAMPOS: { k: keyof Empresa; label: string }[] = [
@@ -79,6 +80,7 @@ export function EmpresaConfig() {
         <button disabled={salvando} onClick={salvar} className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60"><Save className="h-4 w-4" />{salvando ? "Salvando…" : "Salvar"}</button>
         {msg && <span className="text-sm text-muted-foreground">{msg}</span>}
       </div>
+      <FiliaisConfig />
     </section>
   );
 }
