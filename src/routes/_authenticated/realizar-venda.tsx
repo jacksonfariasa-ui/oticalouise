@@ -51,7 +51,7 @@ type Documento = {
   numero: string; tipo: "Pedido" | "Orçamento"; data: string; validade: string; cliente: Cliente; vendedor: string;
   itens: ItemVenda[]; desconto: Desconto; pagamento: string; parcelas: number; entrada: number;
   receita: { od: Olho; oe: Olho }; entrega: string; obs: string;
-  anexo?: { nome: string; tipo: string; url: string };
+  anexo?: { nome: string; tipo: string; url: string } | undefined;
 };
 
 const hoje = () => new Date().toISOString().slice(0, 10);
