@@ -27,6 +27,8 @@ export const Route = createFileRoute("/_authenticated/realizar-venda")({
 
 type Cliente = { id: string; nome: string; cpf: string; telefone: string };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Reg = any;
 type ItemCatalogo = { codigo: string; descricao: string; grupo: string; preco: number; origem: "produto" | "lente" };
 const NOMES_LENTES: Record<string, string> = { "lentes-monofocais": "Lente monofocal", "lentes-multifocais": "Lente multifocal", "lentes-de-contato": "Lente de contato", tratamentos: "Tratamento" };
 
@@ -74,11 +76,11 @@ function RealizarVenda() {
       const out: ItemCatalogo[] = [];
       const rows = data ?? [];
       for (const r of rows) {
-        const lista = Array.isArray(r.dados) ? (r.dados as Record<string, unknown>[]) : [];
+        const lista = Array.isArray(r.dados) ? (r.dados as Reg[]) : [];
         if (r.chave === "produtos") for (const p of lista) out.push({ codigo: String(p.codigo || `P${p.id}`), descricao: String(p.nome ?? ""), grupo: `${p.categoria ?? "Produto"}${Number(p.estoque) >= 0 ? ` · estoque ${p.estoque}` : ""}`, preco: Number(p.preco) || 0, origem: "produto" });
         if (r.chave.startsWith("lentes:")) for (const l of lista) out.push(lenteItem(l, r.chave.slice(7)));
       }
-      if (!rows.some((r) => r.chave === "lentes:lentes-multifocais")) for (const l of VARILUX) out.push(lenteItem(l as unknown as Record<string, unknown>, "lentes-multifocais"));
+      if (!rows.some((r) => r.chave === "lentes:lentes-multifocais")) for (const l of VARILUX) out.push(lenteItem(l as unknown as Reg, "lentes-multifocais"));
       setCatalogo(out);
     });
   }, []);
@@ -393,7 +395,7 @@ function DocumentoImpresso({ doc }: { doc: Documento }) {
   );
 }
 
-function lenteItem(l: Record<string, unknown>, tipo: string): ItemCatalogo {
+function lenteItem(l: Reg, tipo: string): ItemCatalogo {
   const desc = [l.nome, l.material, l.indice].filter(Boolean).join(" ");
   return { codigo: String(l.id ? `L${l.id}` : desc), descricao: desc, grupo: [NOMES_LENTES[tipo] ?? "Lente", l.fornecedor, l.faixa].filter(Boolean).join(" · "), preco: Number(l.preco) || 0, origem: "lente" };
 }
