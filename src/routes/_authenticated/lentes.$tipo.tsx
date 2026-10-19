@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ACCEPT, readTableFile } from "@/lib/import-table";
+import { ACCEPT, imagemDataUrl, isImagem, readTableFile } from "@/lib/import-table";
+import { lerImagemLentes } from "@/lib/lentes-ocr.functions";
 
 const TIPOS: Record<string, string> = {
   "lentes-monofocais": "Lentes Monofocais",
@@ -61,6 +62,7 @@ function Lentes() {
   const [imp, setImp] = useState<{ arquivo: string; linhas: string[][]; mapa: (Campo | "")[] } | null>(null);
   const [erro, setErro] = useState("");
   const [arrastando, setArrastando] = useState(false);
+  const [lendo, setLendo] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const itens = useMemo(() => {
@@ -85,6 +87,8 @@ function Lentes() {
       setImp({ arquivo: file.name, linhas: rows, mapa });
     } catch (e) {
       setErro(e instanceof Error ? e.message : "Não foi possível ler o arquivo.");
+    } finally {
+      setLendo(false);
     }
     if (fileRef.current) fileRef.current.value = "";
   }
@@ -161,7 +165,7 @@ function Lentes() {
         className={`cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-colors ${arrastando ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"}`}>
         <FileUp className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
         <p className="text-sm font-medium">Arraste sua tabela aqui ou clique para escolher</p>
-        <p className="text-xs text-muted-foreground">Aceita PDF, PowerPoint (.pptx), Excel (.xlsx), Word (.docx), CSV, TXT, TSV e HTML. A primeira linha da tabela deve conter os títulos das colunas.</p>
+        <p className="text-xs text-muted-foreground">{lendo ? "Lendo a foto da tabela, aguarde…" : "Aceita foto (JPG/PNG),"} PDF, PowerPoint (.pptx), Excel (.xlsx), Word (.docx), CSV, TXT, TSV e HTML. A primeira linha da tabela deve conter os títulos das colunas.</p>
         <input ref={fileRef} type="file" accept={ACCEPT} className="hidden" onChange={(e) => abrirArquivo(e.target.files?.[0])} />
       </div>
       {erro && <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{erro}</p>}
