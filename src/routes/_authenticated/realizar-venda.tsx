@@ -1,3 +1,4 @@
+import { registrarAtividade } from "@/lib/atividades";
 import { printElement } from "@/lib/print";
 import { distribuirVenda } from "@/lib/venda-etapas";
 import { createFileRoute } from "@tanstack/react-router";
@@ -67,7 +68,8 @@ function RealizarVenda() {
       dados: JSON.parse(JSON.stringify({ ...resto, anexo: anexo ? { nome: anexo.nome, tipo: anexo.tipo } : null })),
     });
     if (error) toast.error("Não foi possível salvar no cadastro do cliente.");
-    else toast.success(`${doc.tipo} ${doc.numero} salvo no cadastro de ${doc.cliente.nome}.`);
+    else registrarAtividade(`Realizar venda: emitiu ${doc.tipo.toLowerCase()} ${doc.numero} para ${doc.cliente.nome} (${brl(calcularTotais(doc.itens, doc.desconto).total)})`);
+    if (!error) toast.success(`${doc.tipo} ${doc.numero} salvo no cadastro de ${doc.cliente.nome}.`);
   }
   const [busca, setBusca] = useState("");
   const [aba, setAba] = useState<"produto" | "lente">("produto");

@@ -1,3 +1,4 @@
+import { registrarAtividade } from "@/lib/atividades";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2, ImageUp, RotateCcw, Save } from "lucide-react";
@@ -30,6 +31,7 @@ export function EmpresaConfig() {
     const { error } = await supabase.from("empresa_config").update({ ...f, updated_at: new Date().toISOString() }).eq("id", 1);
     setSalvando(false);
     if (error) return setMsg("Erro ao salvar: " + error.message);
+    registrarAtividade("Empresa: alterou as informações da empresa");
     await qc.invalidateQueries({ queryKey: ["empresa"] });
     setMsg("Informações salvas.");
   }

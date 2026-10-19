@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { CHAVE_ATIVIDADES, type Atividade } from "@/lib/atividades";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import {
   ArrowDownCircle, ArrowUpCircle, Split, ShieldAlert, Cake, PhoneCall, FileWarning, Truck, CalendarClock, PackageMinus,
@@ -128,6 +130,7 @@ function FullDashboard() {
           </ResponsiveContainer>
         </div>
       </Card>
+      <Atividades />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {WIDGETS.map((w) => {
           const Icon = w.icon;
@@ -156,5 +159,37 @@ function FullDashboard() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function Atividades() {
+  const [lista, setLista] = useState<Atividade[]>([]);
+  const [todas, setTodas] = useState(false);
+  useEffect(() => {
+    const carregar = () => supabase.from("dados_salvos").select("dados").eq("chave", CHAVE_ATIVIDADES).maybeSingle()
+      .then(({ data }) => setLista(data && Array.isArray(data.dados) ? (data.dados as Atividade[]) : []));
+    void carregar();
+    const t = setInterval(carregar, 15000);
+    return () => clearInterval(t);
+  }, []);
+  const vis = todas ? lista : lista.slice(0, 8);
+  return (
+    <Card className="p-5">
+      <div className="mb-3 flex items-baseline justify-between gap-2">
+        <div className="font-semibold">Atividades recentes</div>
+        <div className="text-xs text-muted-foreground">{lista.length} registros</div>
+      </div>
+      {vis.length === 0 ? <p className="text-sm text-muted-foreground">Nenhuma ação registrada ainda.</p> : (
+        <ul className="divide-y text-sm">
+          {vis.map((a, i) => (
+            <li key={a.quando + i} className="flex flex-wrap items-baseline justify-between gap-x-4 py-2">
+              <span className="min-w-0">{a.texto}</span>
+              <span className="text-xs text-muted-foreground">{a.quem} · {new Date(a.quando).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {lista.length > 8 && <Button variant="ghost" size="sm" className="mt-2" onClick={() => setTodas(!todas)}>{todas ? "Ver menos" : "Ver todas"}</Button>}
+    </Card>
   );
 }

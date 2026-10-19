@@ -1,3 +1,4 @@
+import { registrarAtividade } from "@/lib/atividades";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { History, Plus, Search, Trash2 } from "lucide-react";
@@ -58,6 +59,7 @@ function Clientes() {
     if (!form.nome.trim()) return;
     const { error } = await supabase.from("clientes").insert(form);
     if (error) { toast.error("Não foi possível salvar o cliente."); return; }
+    registrarAtividade(`Clientes: cadastrou ${form.nome}`);
     setForm(VAZIO); setAberto(false); void carregar();
   };
 
@@ -65,6 +67,7 @@ function Clientes() {
     if (!confirm(`Excluir ${c.nome} e todo o histórico?`)) return;
     const { error } = await supabase.from("clientes").delete().eq("id", c.id).select();
     if (error) { toast.error("Sem permissão para excluir."); return; }
+    registrarAtividade(`Clientes: excluiu ${c.nome}`);
     void carregar();
   };
 
