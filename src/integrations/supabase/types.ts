@@ -190,6 +190,144 @@ export type Database = {
         }
         Relationships: []
       }
+      fiscal_config: {
+        Row: {
+          aliquota_iss: number
+          ambiente: string
+          certificado_validade: string | null
+          cfop_padrao: string
+          cnpj: string
+          codigo_municipio: string
+          codigo_servico: string
+          csc_id: string
+          csc_token: string
+          cst_padrao: string
+          id: number
+          inscricao_estadual: string
+          inscricao_municipal: string
+          municipio: string
+          ncm_padrao: string
+          provedor: string
+          razao_social: string
+          regime_tributario: string
+          serie_nfce: string
+          serie_nfe: string
+          token: string
+          uf: string
+          updated_at: string
+        }
+        Insert: {
+          aliquota_iss?: number
+          ambiente?: string
+          certificado_validade?: string | null
+          cfop_padrao?: string
+          cnpj?: string
+          codigo_municipio?: string
+          codigo_servico?: string
+          csc_id?: string
+          csc_token?: string
+          cst_padrao?: string
+          id?: number
+          inscricao_estadual?: string
+          inscricao_municipal?: string
+          municipio?: string
+          ncm_padrao?: string
+          provedor?: string
+          razao_social?: string
+          regime_tributario?: string
+          serie_nfce?: string
+          serie_nfe?: string
+          token?: string
+          uf?: string
+          updated_at?: string
+        }
+        Update: {
+          aliquota_iss?: number
+          ambiente?: string
+          certificado_validade?: string | null
+          cfop_padrao?: string
+          cnpj?: string
+          codigo_municipio?: string
+          codigo_servico?: string
+          csc_id?: string
+          csc_token?: string
+          cst_padrao?: string
+          id?: number
+          inscricao_estadual?: string
+          inscricao_municipal?: string
+          municipio?: string
+          ncm_padrao?: string
+          provedor?: string
+          razao_social?: string
+          regime_tributario?: string
+          serie_nfce?: string
+          serie_nfe?: string
+          token?: string
+          uf?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notas_fiscais: {
+        Row: {
+          ambiente: string
+          chave: string
+          cliente_doc: string
+          cliente_nome: string
+          created_at: string
+          created_by: string | null
+          dados: Json
+          id: string
+          mensagem: string
+          numero: string
+          ref: string
+          serie: string
+          status: string
+          tipo: string
+          url_pdf: string
+          url_xml: string
+          valor: number
+        }
+        Insert: {
+          ambiente?: string
+          chave?: string
+          cliente_doc?: string
+          cliente_nome?: string
+          created_at?: string
+          created_by?: string | null
+          dados?: Json
+          id?: string
+          mensagem?: string
+          numero?: string
+          ref: string
+          serie?: string
+          status?: string
+          tipo: string
+          url_pdf?: string
+          url_xml?: string
+          valor?: number
+        }
+        Update: {
+          ambiente?: string
+          chave?: string
+          cliente_doc?: string
+          cliente_nome?: string
+          created_at?: string
+          created_by?: string | null
+          dados?: Json
+          id?: string
+          mensagem?: string
+          numero?: string
+          ref?: string
+          serie?: string
+          status?: string
+          tipo?: string
+          url_pdf?: string
+          url_xml?: string
+          valor?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           acessos: string[] | null
