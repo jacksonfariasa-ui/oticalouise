@@ -18,7 +18,7 @@ export const listUsers = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const admin = await assertAdmin(context);
     const [{ data: profiles }, { data: roles }, { data: auth }] = await Promise.all([
-      admin.from("profiles").select("id, nome, email, filial, created_at").order("created_at"),
+      admin.from("profiles").select("id, nome, email, filial, acessos, created_at").order("created_at"),
       admin.from("user_roles").select("user_id, role"),
       admin.auth.admin.listUsers({ perPage: 200 }),
     ]);
@@ -95,5 +95,16 @@ export const setUserFilial = createServerFn({ method: "POST" })
     const admin = await assertAdmin(context);
     const { error } = await admin.from("profiles").update({ filial: data.filial }).eq("id", data.userId);
     if (error) throw new Error("Não foi possível alterar a filial.");
+    return { ok: true };
+  });
+
+export const setUserAcessos = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ userId: z.string().uuid(), acessos: z.array(z.string().max(60)).max(100).nullable() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const admin = await assertAdmin(context);
+    const acessos = data.acessos ? data.acessos.filter((s) => s !== "administracao") : null;
+    const { error } = await admin.from("profiles").update({ acessos }).eq("id", data.userId);
+    if (error) throw new Error("Não foi possível salvar os acessos.");
     return { ok: true };
   });

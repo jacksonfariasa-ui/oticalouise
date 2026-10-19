@@ -36,7 +36,7 @@ export function AppSidebar({ onNav }: { onNav: () => void }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { role, nome } = useAuth();
+  const { role, nome, acessos } = useAuth();
   const [open, setOpen] = useState<string | null>(null);
   const isActive = (slug: string) =>
     slug === "" ? pathname === "/"
@@ -45,8 +45,8 @@ export function AppSidebar({ onNav }: { onNav: () => void }) {
       : slug === "relatorio" || FILIAIS.includes(slug) ? pathname === `/filiais/${slug}`
       : LENTES.includes(slug) ? pathname === `/lentes/${slug}` : pathname === `/modulo/${slug}`;
 
-  const items = NAV.map((n) => (n.children ? { ...n, children: n.children.filter((c) => canAccess(role, c.slug)) } : n))
-    .filter((n) => (n.children ? n.children.length > 0 : canAccess(role, n.slug)));
+  const items = NAV.map((n) => (n.children ? { ...n, children: n.children.filter((c) => canAccess(role, c.slug, acessos)) } : n))
+    .filter((n) => (n.children ? n.children.length > 0 : canAccess(role, n.slug, acessos)));
 
   async function sair() {
     await qc.cancelQueries();

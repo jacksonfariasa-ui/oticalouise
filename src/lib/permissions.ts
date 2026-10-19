@@ -22,13 +22,24 @@ const TECNICO = new Set([
   "estoque", "validade-de-produtos", "produtos-abaixo-do-minimo",
 ]);
 
-/** Whether a role may open the section identified by its menu slug ("" = painel). */
-export function canAccess(role: Role | null | undefined, slug: string): boolean {
+/**
+ * Whether a role may open the section identified by its menu slug ("" = painel).
+ * `acessos` = per-user list chosen by the admin; null/undefined = role defaults.
+ * Admin always has everything; administration is never grantable to others; painel always open.
+ */
+export function canAccess(role: Role | null | undefined, slug: string, acessos?: string[] | null): boolean {
   if (!role) return false;
   if (role === "admin") return true;
-  if (role === "gerente") return slug !== "administracao";
+  if (slug === "administracao") return false;
+  if (acessos) return slug === "" || acessos.includes(slug);
+  if (role === "gerente") return true;
   if (role === "vendedor") return VENDEDOR.has(slug);
   return TECNICO.has(slug);
+}
+
+/** All grantable section slugs (leaf menu items), excluding painel and administração. */
+export function grantableSlugs(nav: { slug: string; children?: { slug: string }[] }[]): string[] {
+  return nav.flatMap((n) => (n.children ? n.children.map((c) => c.slug) : [n.slug])).filter((s) => s && s !== "administracao");
 }
 
 /** Maps a URL path to the menu slug used for permission checks. */

@@ -19,13 +19,13 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { role, loading } = useAuth();
+  const { role, loading, acessos } = useAuth();
   const { pathname } = useLocation();
 
   if (loading) return <div className="grid min-h-screen place-items-center text-sm text-muted-foreground">Carregando…</div>;
   if (!role) return <Pending />;
 
-  const allowed = canAccess(role, slugFromPath(pathname));
+  const allowed = canAccess(role, slugFromPath(pathname), acessos);
   return (
     <div className="min-h-screen bg-background text-foreground">
       <aside className={cn("fixed inset-y-0 left-0 z-40 w-64 transition-transform lg:translate-x-0", mobileOpen ? "translate-x-0" : "-translate-x-full")}>

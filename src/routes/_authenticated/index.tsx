@@ -74,11 +74,11 @@ function Dashboard() {
 }
 
 function SellerHome() {
-  const { nome } = useAuth();
+  const { nome, acessos } = useAuth();
   const buttons = NAV.flatMap((n) =>
     n.children
-      ? n.children.filter((c) => canAccess("vendedor", c.slug)).map((c) => ({ label: c.label, slug: c.slug, icon: n.icon }))
-      : n.slug && canAccess("vendedor", n.slug) ? [{ label: n.label, slug: n.slug, icon: n.icon }] : [],
+      ? n.children.filter((c) => canAccess("vendedor", c.slug, acessos)).map((c) => ({ label: c.label, slug: c.slug, icon: n.icon }))
+      : n.slug && canAccess("vendedor", n.slug, acessos) ? [{ label: n.label, slug: n.slug, icon: n.icon }] : [],
   );
   return (
     <div className="space-y-6">
