@@ -270,7 +270,7 @@ const TOM_PERFIL: Record<string, string> = {
 const iniciais = (n: string) => n.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join("") || "?";
 const dataBR = (d: string | null) => (d ? new Date(d).toLocaleDateString("pt-BR") : "—");
 
-function RegistroEquipe({ users, selfId }: { users: Membro[]; selfId?: string }) {
+function RegistroEquipe({ users, selfId }: { users: Membro[]; selfId?: string | undefined }) {
   const [busca, setBusca] = useState("");
   const q = busca.trim().toLowerCase();
   const lista = [...users].sort((a, b) => b.created_at.localeCompare(a.created_at))
