@@ -13,8 +13,8 @@ import logo from "@/assets/otica-louise.jpg.asset.json";
 const FILIAIS = ["matriz", "rorainopolis", "pintolandia"];
 const LENTES = ["lentes-monofocais", "lentes-multifocais", "lentes-de-contato", "tratamentos"];
 
-function Item({ to, active, children, onNav }: { to: string; active: boolean; children: React.ReactNode; onNav: () => void }) {
-  const cls = cn(
+export function Item({ to, active, children, onNav, className }: { to: string; active: boolean; children: React.ReactNode; onNav: () => void; className?: string }) {
+  const cls = className ?? cn(
     "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent",
     active && "bg-sidebar-accent text-sidebar-primary font-semibold",
   );
