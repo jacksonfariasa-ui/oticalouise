@@ -124,7 +124,6 @@ function Produtos() {
         </DialogContent>
       </Dialog>
 
-      </div>
       <Card className="p-4">
         <div className="mb-4 flex flex-wrap gap-2">
           <div className="relative min-w-60 flex-1">
