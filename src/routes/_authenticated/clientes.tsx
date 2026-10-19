@@ -57,14 +57,14 @@ function Clientes() {
     e.preventDefault();
     if (!form.nome.trim()) return;
     const { error } = await supabase.from("clientes").insert(form);
-    if (error) return toast.error("Não foi possível salvar o cliente.");
+    if (error) { toast.error("Não foi possível salvar o cliente."); return; }
     setForm(VAZIO); setAberto(false); void carregar();
   };
 
   const excluir = async (c: Cliente) => {
     if (!confirm(`Excluir ${c.nome} e todo o histórico?`)) return;
     const { error } = await supabase.from("clientes").delete().eq("id", c.id).select();
-    if (error) return toast.error("Sem permissão para excluir.");
+    if (error) { toast.error("Sem permissão para excluir."); return; }
     void carregar();
   };
 
