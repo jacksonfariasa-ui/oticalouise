@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/lib/auth";
 import { brl, calcularTotais, valorParcela, type Desconto, type ItemVenda } from "@/lib/venda";
+import { VARILUX } from "@/lib/lentes-varilux";
 import logo from "@/assets/otica-louise.jpg.asset.json";
 
 export const Route = createFileRoute("/_authenticated/realizar-venda")({
@@ -26,7 +27,10 @@ export const Route = createFileRoute("/_authenticated/realizar-venda")({
 
 type Cliente = { id: string; nome: string; cpf: string; telefone: string };
 
-const CATALOGO: { codigo: string; descricao: string; grupo: string; preco: number }[] = [];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Reg = any;
+type ItemCatalogo = { codigo: string; descricao: string; grupo: string; preco: number; origem: "produto" | "lente" };
+const NOMES_LENTES: Record<string, string> = { "lentes-monofocais": "Lente monofocal", "lentes-multifocais": "Lente multifocal", "lentes-de-contato": "Lente de contato", tratamentos: "Tratamento" };
 
 const PAGAMENTOS = ["Dinheiro", "PIX", "Cartão de débito", "Cartão de crédito", "Boleto", "Crediário"];
 type Olho = { esf: string; cil: string; eixo: string; adicao: string; dnp: string };
@@ -65,6 +69,21 @@ function RealizarVenda() {
     else toast.success(`${doc.tipo} ${doc.numero} salvo no cadastro de ${doc.cliente.nome}.`);
   }
   const [busca, setBusca] = useState("");
+  const [aba, setAba] = useState<"produto" | "lente">("produto");
+  const [CATALOGO, setCatalogo] = useState<ItemCatalogo[]>([]);
+  useEffect(() => {
+    supabase.from("dados_salvos").select("chave, dados").then(({ data }) => {
+      const out: ItemCatalogo[] = [];
+      const rows = data ?? [];
+      for (const r of rows) {
+        const lista = Array.isArray(r.dados) ? (r.dados as Reg[]) : [];
+        if (r.chave === "produtos") for (const p of lista) out.push({ codigo: String(p.codigo || `P${p.id}`), descricao: String(p.nome ?? ""), grupo: `${p.categoria ?? "Produto"}${Number(p.estoque) >= 0 ? ` · estoque ${p.estoque}` : ""}`, preco: Number(p.preco) || 0, origem: "produto" });
+        if (r.chave.startsWith("lentes:")) for (const l of lista) out.push(lenteItem(l, r.chave.slice(7)));
+      }
+      if (!rows.some((r) => r.chave === "lentes:lentes-multifocais")) for (const l of VARILUX) out.push(lenteItem(l as unknown as Reg, "lentes-multifocais"));
+      setCatalogo(out);
+    });
+  }, []);
   const [itens, setItens] = useState<ItemVenda[]>([]);
   const [desconto, setDesconto] = useState<Desconto>({ tipo: "percentual", valor: 0 });
   const [pagamento, setPagamento] = useState("PIX");
@@ -83,8 +102,8 @@ function RealizarVenda() {
   const parcelavel = ["Cartão de crédito", "Boleto", "Crediário"].includes(pagamento);
   const resultados = useMemo(() => {
     const q = busca.trim().toLowerCase();
-    return CATALOGO.filter((p) => !q || p.descricao.toLowerCase().includes(q) || p.codigo.toLowerCase().includes(q));
-  }, [busca]);
+    return CATALOGO.filter((p) => p.origem === aba && (!q || p.descricao.toLowerCase().includes(q) || p.codigo.toLowerCase().includes(q) || p.grupo.toLowerCase().includes(q)));
+  }, [busca, aba, CATALOGO]);
 
   function adicionar(p: (typeof CATALOGO)[number]) {
     setItens((l) => {
@@ -147,17 +166,25 @@ function RealizarVenda() {
 
           <Card className="p-5">
             <h2 className="mb-3 font-semibold">2. Produtos e lentes</h2>
+            <div className="mb-3 flex gap-2">
+              {(["produto", "lente"] as const).map((a) => (
+                <Button key={a} type="button" size="sm" variant={aba === a ? "default" : "outline"} onClick={() => setAba(a)}>
+                  {a === "produto" ? "Produtos" : "Lentes"} ({CATALOGO.filter((c) => c.origem === a).length})
+                </Button>
+              ))}
+            </div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input className="pl-9" placeholder="Buscar por nome ou código" value={busca} onChange={(e) => setBusca(e.target.value)} />
             </div>
             <div className="mt-3 grid max-h-56 gap-2 overflow-y-auto sm:grid-cols-2">
               {resultados.map((p) => (
-                <button key={p.codigo} onClick={() => adicionar(p)} className="flex items-center justify-between gap-2 rounded-md border p-3 text-left text-sm transition-colors hover:bg-accent">
+                <button key={p.origem + p.codigo + p.descricao} onClick={() => adicionar(p)} className="flex items-center justify-between gap-2 rounded-md border p-3 text-left text-sm transition-colors hover:bg-accent">
                   <span className="min-w-0"><span className="block truncate font-medium">{p.descricao}</span><span className="text-xs text-muted-foreground">{p.codigo} · {p.grupo}</span></span>
                   <span className="shrink-0 font-semibold">{brl(p.preco)}</span>
                 </button>
               ))}
+              {resultados.length === 0 && <p className="col-span-full rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">{aba === "produto" ? "Nenhum produto cadastrado ou encontrado." : "Nenhuma lente cadastrada ou encontrada."}</p>}
             </div>
 
             <div className="mt-5 space-y-2">
@@ -366,4 +393,9 @@ function DocumentoImpresso({ doc }: { doc: Documento }) {
       {doc.tipo === "Orçamento" && <p className="text-center text-xs text-muted-foreground">Orçamento sem valor fiscal. Preços sujeitos a alteração após a validade.</p>}
     </div>
   );
+}
+
+function lenteItem(l: Reg, tipo: string): ItemCatalogo {
+  const desc = [l.nome, l.material, l.indice].filter(Boolean).join(" ");
+  return { codigo: String(l.id ? `L${l.id}` : desc), descricao: desc, grupo: [NOMES_LENTES[tipo] ?? "Lente", l.fornecedor, l.faixa].filter(Boolean).join(" · "), preco: Number(l.preco) || 0, origem: "lente" };
 }
