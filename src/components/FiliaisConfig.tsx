@@ -34,10 +34,12 @@ export function FiliaisConfig() {
   const atual = filiais.find((f) => f.id === sel);
   const [f, setF] = useState<Info | null>(null);
   const [msg, setMsg] = useState("");
+  const [meta, setMeta] = useState("");
   useEffect(() => {
     if (!atual) return;
     const { id, nome, status, cnpj, endereco, cidade, telefone, email, horario, gerente } = atual;
     setF({ id, nome, status, cnpj, endereco, cidade, telefone, email, horario, gerente });
+    setMeta(atual.meta ? String(atual.meta) : "");
     setMsg("");
   }, [atual]);
 
@@ -46,7 +48,8 @@ export function FiliaisConfig() {
     const { error } = await supabase.from("filiais_info").upsert({ ...f, updated_at: new Date().toISOString() });
     if (error) return setMsg("Erro ao salvar: " + error.message);
     registrarAtividade(`Filiais: alterou os dados de ${f.nome}`);
-    updateFilial(f.id, (x) => ({ ...x, ...f }));
+    const m = Math.max(0, Number(meta) || 0);
+    updateFilial(f.id, (x) => ({ ...x, ...f, meta: m }));
     await qc.invalidateQueries({ queryKey: ["filiais_info"] });
     setMsg("Filial salva.");
   }
@@ -68,6 +71,10 @@ export function FiliaisConfig() {
                 <input value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm" />
               </label>
             ))}
+            <label>
+              <span className="text-xs font-medium text-muted-foreground">Meta mensal de faturamento (R$)</span>
+              <input type="number" min={0} value={meta} onChange={(e) => setMeta(e.target.value)} placeholder="0" className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm" />
+            </label>
             <label>
               <span className="text-xs font-medium text-muted-foreground">Situação</span>
               <select value={f.status} onChange={(e) => setF({ ...f, status: e.target.value as Filial["status"] })} className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm">
