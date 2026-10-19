@@ -1,4 +1,5 @@
 import { printElement } from "@/lib/print";
+import { distribuirVenda } from "@/lib/venda-etapas";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
