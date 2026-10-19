@@ -36,6 +36,13 @@
       "when": 1792431126172,
       "tag": "0004_empresa_config",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792431462350,
+      "tag": "0005_filiais_info",
+      "breakpoints": true
     }
   ]
 }

@@ -53,6 +53,48 @@ export type Database = {
         }
         Relationships: []
       }
+      filiais_info: {
+        Row: {
+          cidade: string
+          cnpj: string
+          email: string
+          endereco: string
+          gerente: string
+          horario: string
+          id: string
+          nome: string
+          status: string
+          telefone: string
+          updated_at: string
+        }
+        Insert: {
+          cidade?: string
+          cnpj?: string
+          email?: string
+          endereco?: string
+          gerente?: string
+          horario?: string
+          id: string
+          nome: string
+          status?: string
+          telefone?: string
+          updated_at?: string
+        }
+        Update: {
+          cidade?: string
+          cnpj?: string
+          email?: string
+          endereco?: string
+          gerente?: string
+          horario?: string
+          id?: string
+          nome?: string
+          status?: string
+          telefone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           acessos: string[] | null

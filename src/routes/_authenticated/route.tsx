@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect, useLocation, Link } from "@tanstack/
 import { useState } from "react";
 import { Menu, ShieldX, Clock, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { FiliaisSync } from "@/components/FiliaisConfig";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/lib/auth";
 import { canAccess, roleLabel, slugFromPath } from "@/lib/permissions";
@@ -29,6 +30,7 @@ function AppLayout() {
   const allowed = canAccess(role, slugFromPath(pathname), acessos);
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <FiliaisSync />
       <aside className={cn("fixed inset-y-0 left-0 z-40 w-64 transition-transform lg:translate-x-0", mobileOpen ? "translate-x-0" : "-translate-x-full")}>
         <AppSidebar onNav={() => setMobileOpen(false)} />
       </aside>
