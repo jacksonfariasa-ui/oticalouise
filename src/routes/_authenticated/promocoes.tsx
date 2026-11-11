@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { usePersistedList } from "@/lib/persisted";
+import { savedListOptions } from "@/lib/saved-data";
+import { DataError, DataNotFound } from "@/components/RouteFeedback";
 import { useMemo, useState } from "react";
 import { CalendarDays, Plus, Search, Tag, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -14,8 +16,13 @@ export const Route = createFileRoute("/_authenticated/promocoes")({
       { name: "description", content: "Crie e acompanhe promoções de armações, lentes e acessórios." },
       { property: "og:title", content: "Promoções — Ótica Louise" },
       { property: "og:description", content: "Crie e acompanhe promoções de armações, lentes e acessórios." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
+  loader: async ({ context }) => { await context.queryClient.ensureQueryData(savedListOptions<Promo>("promocoes", [])); },
+  errorComponent: DataError,
+  notFoundComponent: DataNotFound,
   component: Promocoes,
 });
 

@@ -1,6 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { usePersistedList } from "@/lib/persisted";
-import { useMemo, useState } from "react";
+import { savedListOptions } from "@/lib/saved-data";
+import { reportOptions } from "@/lib/report-data";
+import { DataError, DataNotFound } from "@/components/RouteFeedback";
+import { TablePager } from "@/components/TablePager";
+import { useTablePage } from "@/hooks/use-table-page";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { Construction, Plus, Search, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,21 +13,28 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { findLabel } from "@/lib/nav";
 import { MODULES, type Mod } from "@/lib/modules";
-import { Relatorios } from "@/components/Relatorios";
+const Relatorios = lazy(() => import("@/components/Relatorios").then((module) => ({ default: module.Relatorios })));
 
 export const Route = createFileRoute("/_authenticated/modulo/$slug")({
   head: ({ params }) => {
     const t = `${findLabel(params.slug)} — Ótica Louise`;
     const d = MODULES[params.slug]?.desc ?? `Módulo ${findLabel(params.slug)} do sistema de gestão para óticas.`;
-    return { meta: [{ title: t }, { name: "description", content: d }, { property: "og:title", content: t }, { property: "og:description", content: d }] };
+    return { meta: [{ title: t }, { name: "description", content: d }, { property: "og:title", content: t }, { property: "og:description", content: d }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] };
   },
+  loader: async ({ context, params }) => {
+    if (params.slug === "relatorios") { await context.queryClient.ensureQueryData(reportOptions); return; }
+    const mod = MODULES[params.slug];
+    if (mod) await context.queryClient.ensureQueryData(savedListOptions<Row>(`modulo:${findLabel(params.slug)}`, () => mod.linhas.map((row, i) => ({ _id: i, ...Object.fromEntries(mod.campos.map(([key], j) => [key, row[j] ?? ""])) }))));
+  },
+  errorComponent: DataError,
+  notFoundComponent: DataNotFound,
   component: Modulo,
 });
 
 function Modulo() {
   const { slug } = Route.useParams();
   const mod = MODULES[slug];
-  if (slug === "relatorios") return <Relatorios />;
+  if (slug === "relatorios") return <Suspense fallback={<p className="py-8 text-muted-foreground">Carregando…</p>}><Relatorios /></Suspense>;
   if (!mod) {
     return (
       <div className="space-y-6">
@@ -57,6 +69,7 @@ function Tabela({ titulo, mod }: { titulo: string; mod: Mod }) {
     const q = busca.toLowerCase();
     return rows.filter((r) => (!filtro || r[mod.status!] === filtro) && Object.values(r).some((v) => String(v).toLowerCase().includes(q)));
   }, [rows, busca, filtro, mod.status]);
+  const pagination = useTablePage(itens, `${busca}:${filtro}`);
   const total = mod.valor ? itens.reduce((a, r) => a + Number(r[mod.valor!] || 0), 0) : 0;
 
   const fmt = (v: string | number, t: unknown) =>
@@ -110,7 +123,7 @@ function Tabela({ titulo, mod }: { titulo: string; mod: Mod }) {
               {mod.campos.map(([k, l, t]) => <th key={k} className={`py-2 pr-3 ${t === "m" || t === "n" ? "text-right" : ""}`}>{l}</th>)}<th />
             </tr></thead>
             <tbody>
-              {itens.map((r) => (
+              {pagination.visible.map((r) => (
                 <tr key={r._id} className="border-b last:border-0">
                   {mod.campos.map(([k, , t], i) => (
                     <td key={k} className={`py-2 pr-3 ${i === 0 || i === 1 ? "font-medium" : ""} ${t === "m" || t === "n" ? "text-right" : ""}`}>
@@ -129,6 +142,7 @@ function Tabela({ titulo, mod }: { titulo: string; mod: Mod }) {
             </tbody>
           </table>
         </div>
+        <TablePager {...pagination} />
       </Card>
 
       <Dialog open={aberto} onOpenChange={setAberto}>

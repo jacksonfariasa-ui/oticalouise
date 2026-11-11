@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { BarChart3, RefreshCw, ShoppingCart, Users, Wallet } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { reportOptions } from "@/lib/report-data";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { findLabel } from "@/lib/nav";
@@ -15,19 +16,9 @@ const chave = (slug: string) => `modulo:${findLabel(slug)}`;
 const mesAtual = () => new Date().toISOString().slice(0, 7);
 
 function useDados() {
-  const [dados, setDados] = useState<Record<string, Reg[]>>({});
-  const [vez, setVez] = useState(0);
-  useEffect(() => {
-    let ativo = true;
-    const carregar = () => supabase.from("dados_salvos").select("chave, dados").then(({ data }) => {
-      if (!ativo) return;
-      setDados(Object.fromEntries((data ?? []).map((r) => [r.chave, Array.isArray(r.dados) ? (r.dados as Reg[]) : []])));
-    });
-    void carregar();
-    const t = setInterval(carregar, 15000);
-    return () => { ativo = false; clearInterval(t); };
-  }, [vez]);
-  return [dados, () => setVez((v) => v + 1)] as const;
+  const qc = useQueryClient();
+  const { data } = useSuspenseQuery(reportOptions);
+  return [data, () => void qc.invalidateQueries({ queryKey: reportOptions.queryKey })] as const;
 }
 
 export function Relatorios() {
@@ -41,7 +32,7 @@ export function Relatorios() {
   const receber = (dados[chave("contas-a-receber")] ?? []).filter((c) => str(c["status"]) !== "Recebido");
   const pagar = (dados[chave("contas-a-pagar")] ?? []).filter((c) => str(c["status"]) !== "Pago");
   const os = dados[chave("ordens-de-servico")] ?? [];
-  const atividades = ((dados[CHAVE_ATIVIDADES] ?? []) as unknown as Atividade[]).filter((a) => noMes(a.quando));
+  const atividades = useMemo(() => ((dados[CHAVE_ATIVIDADES] ?? []) as unknown as Atividade[]).filter((a) => !mes || str(a.quando).startsWith(mes)), [dados, mes]);
 
   const totalVendas = vendas.reduce((s, v) => s + num(v["total"]), 0);
   const entradas = caixa.filter((c) => c["tipo"] === "Entrada").reduce((s, c) => s + num(c["valor"]), 0);
@@ -50,7 +41,13 @@ export function Relatorios() {
   const porPagamento = agrupar(vendas, (v) => str(v["pagamento"]) || "—", (v) => num(v["total"]));
   const equipe = useMemo(() => {
     const m = new Map<string, { vendas: number; valor: number; acoes: number; ultima: string }>();
-    const get = (n: string) => m.get(n) ?? (m.set(n, { vendas: 0, valor: 0, acoes: 0, ultima: "" }), m.get(n)!);
+    const get = (n: string) => {
+      const existing = m.get(n);
+      if (existing) return existing;
+      const value = { vendas: 0, valor: 0, acoes: 0, ultima: "" };
+      m.set(n, value);
+      return value;
+    };
     for (const v of vendas) { const e = get(str(v["vendedor"]) || "Sem vendedor"); e.vendas++; e.valor += num(v["total"]); }
     for (const a of atividades) { const e = get(a.quem); e.acoes++; if (a.quando > e.ultima) e.ultima = a.quando; }
     return [...m.entries()].sort((a, b) => b[1].valor - a[1].valor || b[1].acoes - a[1].acoes);
