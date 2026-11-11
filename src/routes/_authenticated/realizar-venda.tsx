@@ -2,7 +2,13 @@ import { registrarAtividade } from "@/lib/atividades";
 import { printElement } from "@/lib/print";
 import { distribuirVenda } from "@/lib/venda-etapas";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { clientOptions } from "@/lib/client-data";
+import { catalogOptions } from "@/lib/sale-catalog";
+import { DataError, DataNotFound } from "@/components/RouteFeedback";
+import { TablePager } from "@/components/TablePager";
+import { useTablePage } from "@/hooks/use-table-page";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Camera, FileText, Minus, Plus, Printer, Search, ShoppingBag, Trash2, Eye, ArrowRightLeft, Paperclip, X } from "lucide-react";
@@ -12,17 +18,11 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/lib/auth";
 import { brl, calcularTotais, valorParcela, type Desconto, type ItemVenda } from "@/lib/venda";
-import { VARILUX } from "@/lib/lentes-varilux";
 import logo from "@/assets/otica-louise.jpg.asset.json";
-import { lerReceita } from "@/lib/receita-ocr.functions";
 
 async function reduzirImagem(file: File, max = 1600): Promise<string> {
-  const bmp = await createImageBitmap(file);
-  const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
-  const cv = document.createElement("canvas");
-  cv.width = Math.round(bmp.width * s); cv.height = Math.round(bmp.height * s);
-  cv.getContext("2d")!.drawImage(bmp, 0, 0, cv.width, cv.height);
-  return cv.toDataURL("image/jpeg", 0.85);
+  const { imagemDataUrl } = await import("@/lib/import-table");
+  return imagemDataUrl(file, max);
 }
 
 export const Route = createFileRoute("/_authenticated/realizar-venda")({
@@ -32,17 +32,17 @@ export const Route = createFileRoute("/_authenticated/realizar-venda")({
       { name: "description", content: "Monte a venda, emita pedido ou orçamento e imprima para o cliente." },
       { property: "og:title", content: "Realizar Venda — Ótica Louise" },
       { property: "og:description", content: "Monte a venda, emita pedido ou orçamento e imprima para o cliente." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
+  loader: async ({ context }) => { await Promise.all([context.queryClient.ensureQueryData(clientOptions), context.queryClient.ensureQueryData(catalogOptions)]); },
+  errorComponent: DataError,
+  notFoundComponent: DataNotFound,
   component: RealizarVenda,
 });
 
 type Cliente = { id: string; nome: string; cpf: string; telefone: string };
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Reg = any;
-type ItemCatalogo = { codigo: string; descricao: string; grupo: string; preco: number; origem: "produto" | "lente" };
-const NOMES_LENTES: Record<string, string> = { "lentes-monofocais": "Lente monofocal", "lentes-multifocais": "Lente multifocal", "lentes-de-contato": "Lente de contato", tratamentos: "Tratamento" };
 
 const PAGAMENTOS = ["Dinheiro", "PIX", "Cartão de débito", "Cartão de crédito", "Boleto", "Crediário"];
 type Olho = { esf: string; cil: string; eixo: string; adicao: string; dnp: string };
@@ -64,13 +64,14 @@ const EXEMPLOS: Documento[] = [];
 
 function RealizarVenda() {
   const { nome } = useAuth();
+  const qc = useQueryClient();
+  const attachmentUrls = useRef(new Set<string>());
+  useEffect(() => () => { attachmentUrls.current.forEach((url) => URL.revokeObjectURL(url)); attachmentUrls.current.clear(); }, []);
+  const attachmentUrl = (file: File) => { const url = URL.createObjectURL(file); attachmentUrls.current.add(url); return url; };
   const [docs, setDocs] = useState<Documento[]>(EXEMPLOS);
   const [seq, setSeq] = useState({ ped: 1, orc: 1 });
   const [clienteId, setClienteId] = useState<string>("");
-  const [CLIENTES, setClientes] = useState<Cliente[]>([]);
-  useEffect(() => {
-    supabase.from("clientes").select("id,nome,cpf,telefone").order("nome").then(({ data }) => setClientes(data ?? []));
-  }, []);
+  const { data: CLIENTES } = useSuspenseQuery(clientOptions);
   async function registrar(doc: Documento) {
     const { anexo, ...resto } = doc;
     const { error } = await supabase.from("cliente_vendas").insert({
@@ -83,20 +84,7 @@ function RealizarVenda() {
   }
   const [busca, setBusca] = useState("");
   const [aba, setAba] = useState<"produto" | "lente">("produto");
-  const [CATALOGO, setCatalogo] = useState<ItemCatalogo[]>([]);
-  useEffect(() => {
-    supabase.from("dados_salvos").select("chave, dados").then(({ data }) => {
-      const out: ItemCatalogo[] = [];
-      const rows = data ?? [];
-      for (const r of rows) {
-        const lista = Array.isArray(r.dados) ? (r.dados as Reg[]) : [];
-        if (r.chave === "produtos") for (const p of lista) out.push({ codigo: String(p.codigo || `P${p.id}`), descricao: String(p.nome ?? ""), grupo: `${p.categoria ?? "Produto"}${Number(p.estoque) >= 0 ? ` · estoque ${p.estoque}` : ""}`, preco: Number(p.preco) || 0, origem: "produto" });
-        if (r.chave.startsWith("lentes:")) for (const l of lista) out.push(lenteItem(l, r.chave.slice(7)));
-      }
-      if (!rows.some((r) => r.chave === "lentes:lentes-multifocais")) for (const l of VARILUX) out.push(lenteItem(l as unknown as Reg, "lentes-multifocais"));
-      setCatalogo(out);
-    });
-  }, []);
+  const { data: CATALOGO } = useSuspenseQuery(catalogOptions);
   const [itens, setItens] = useState<ItemVenda[]>([]);
   const [desconto, setDesconto] = useState<Desconto>({ tipo: "percentual", valor: 0 });
   const [pagamento, setPagamento] = useState("PIX");
@@ -113,6 +101,7 @@ function RealizarVenda() {
     const t = toast.loading("Lendo a receita...");
     try {
       const imagem = await reduzirImagem(file);
+      const { lerReceita } = await import("@/lib/receita-ocr.functions");
       const r = await lerReceita({ data: { imagem } });
       const juntar = (atual: Olho, novo: Olho): Olho => ({ esf: novo.esf || atual.esf, cil: novo.cil || atual.cil, eixo: novo.eixo || atual.eixo, adicao: novo.adicao || atual.adicao, dnp: novo.dnp || atual.dnp });
       setOd((a) => juntar(a, r.od)); setOe((a) => juntar(a, r.oe));
@@ -131,6 +120,12 @@ function RealizarVenda() {
     const q = busca.trim().toLowerCase();
     return CATALOGO.filter((p) => p.origem === aba && (!q || p.descricao.toLowerCase().includes(q) || p.codigo.toLowerCase().includes(q) || p.grupo.toLowerCase().includes(q)));
   }, [busca, aba, CATALOGO]);
+  const pagination = useTablePage(resultados, `${aba}:${busca}`, 40);
+  const refreshSaleData = () => {
+    void qc.invalidateQueries({ queryKey: ["saved-list"] });
+    void qc.invalidateQueries({ queryKey: ["catalogo-venda"] });
+    void qc.invalidateQueries({ queryKey: ["relatorios"] });
+  };
 
   function adicionar(p: (typeof CATALOGO)[number]) {
     setItens((l) => {
@@ -158,7 +153,7 @@ function RealizarVenda() {
     setDocs((d) => [doc, ...d]);
     void registrar(doc);
     if (tipo === "Pedido") distribuirVenda({ ...doc, cliente: cliente.nome })
-      .then(() => toast.success("Venda lançada em Vendas, O.S., Financeiro e Estoque."))
+      .then(() => { refreshSaleData(); toast.success("Venda lançada em Vendas, O.S., Financeiro e Estoque."); })
       .catch(() => toast.error("Não foi possível lançar a venda em todas as etapas."));
     limpar();
     setVisualizar(doc);
@@ -171,7 +166,7 @@ function RealizarVenda() {
     setDocs((d) => [novo, ...d]);
     void registrar(novo);
     distribuirVenda({ ...novo, cliente: novo.cliente.nome })
-      .then(() => toast.success("Venda lançada em Vendas, O.S., Financeiro e Estoque."))
+      .then(() => { refreshSaleData(); toast.success("Venda lançada em Vendas, O.S., Financeiro e Estoque."); })
       .catch(() => toast.error("Não foi possível lançar a venda em todas as etapas."));
     setVisualizar(novo);
   }
@@ -211,7 +206,7 @@ function RealizarVenda() {
               <Input className="pl-9" placeholder="Buscar por nome ou código" value={busca} onChange={(e) => setBusca(e.target.value)} />
             </div>
             <div className="mt-3 grid max-h-56 gap-2 overflow-y-auto sm:grid-cols-2">
-              {resultados.map((p) => (
+              {pagination.visible.map((p) => (
                 <button key={p.origem + p.codigo + p.descricao} onClick={() => adicionar(p)} className="flex items-center justify-between gap-2 rounded-md border p-3 text-left text-sm transition-colors hover:bg-accent">
                   <span className="min-w-0"><span className="block truncate font-medium">{p.descricao}</span><span className="text-xs text-muted-foreground">{p.codigo} · {p.grupo}</span></span>
                   <span className="shrink-0 font-semibold">{brl(p.preco)}</span>
@@ -219,6 +214,7 @@ function RealizarVenda() {
               ))}
               {resultados.length === 0 && <p className="col-span-full rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">{aba === "produto" ? "Nenhum produto cadastrado ou encontrado." : "Nenhuma lente cadastrada ou encontrada."}</p>}
             </div>
+            <TablePager {...pagination} />
 
             <div className="mt-5 space-y-2">
               {itens.length === 0 && <p className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">Nenhum item adicionado. Clique em um produto acima.</p>}
@@ -262,7 +258,7 @@ function RealizarVenda() {
                   if (!file) return;
                   if (!/\.(jpe?g|pdf)$/i.test(file.name)) return setErro("A receita deve ser um arquivo JPG ou PDF.");
                   if (file.size > 10 * 1024 * 1024) return setErro("Arquivo muito grande (máximo 10 MB).");
-                  setErro(""); setAnexo({ nome: file.name, tipo: file.type || (file.name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg"), url: URL.createObjectURL(file) });
+                  setErro(""); setAnexo({ nome: file.name, tipo: file.type || (file.name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg"), url: attachmentUrl(file) });
                 }} />
               </label>
               <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-accent">
@@ -272,7 +268,7 @@ function RealizarVenda() {
                   if (!file) return;
                   if (!file.type.startsWith("image/")) return setErro("A foto deve ser uma imagem.");
                   if (file.size > 10 * 1024 * 1024) return setErro("Foto muito grande (máximo 10 MB).");
-                  setErro(""); setAnexo({ nome: file.name || "foto-receita.jpg", tipo: file.type, url: URL.createObjectURL(file) });
+                  setErro(""); setAnexo({ nome: file.name || "foto-receita.jpg", tipo: file.type, url: attachmentUrl(file) });
                   void preencherReceita(file);
                 }} />
               </label>
@@ -429,7 +425,3 @@ function DocumentoImpresso({ doc }: { doc: Documento }) {
   );
 }
 
-function lenteItem(l: Reg, tipo: string): ItemCatalogo {
-  const desc = [l.nome, l.material, l.indice].filter(Boolean).join(" ");
-  return { codigo: String(l.id ? `L${l.id}` : desc), descricao: desc, grupo: [NOMES_LENTES[tipo] ?? "Lente", l.fornecedor, l.faixa].filter(Boolean).join(" · "), preco: Number(l.preco) || 0, origem: "lente" };
-}
