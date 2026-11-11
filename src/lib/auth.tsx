@@ -12,9 +12,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let alive = true;
+    let generation = 0;
+    let currentUser: string | null = null;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     async function load(session: Session | null) {
-      if (!session) { if (alive) setState(EMPTY); return; }
+      if (!session) { generation++; currentUser = null; if (alive) setState(EMPTY); return; }
       const uid = session.user.id;
+      if (currentUser === uid) {
+        setState((previous) => previous.session ? { ...previous, session } : previous);
+        return;
+      }
+      currentUser = uid;
+      const request = ++generation;
       const [{ data: roles }, { data: prof }] = await Promise.all([
         supabase.from("user_roles").select("role").eq("user_id", uid),
         supabase.from("profiles").select("nome, acessos").eq("id", uid).maybeSingle(),
@@ -22,13 +31,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const order: Role[] = ["admin", "gerente", "vendedor", "tecnico"];
       const list = (roles ?? []).map((r) => r.role as Role);
       const role = order.find((r) => list.includes(r)) ?? null;
-      if (alive) setState({ session, role, nome: prof?.nome || session.user.email || "", acessos: prof?.acessos ?? null, loading: false });
+      if (alive && generation === request) setState({ session, role, nome: prof?.nome || session.user.email || "", acessos: prof?.acessos ?? null, loading: false });
     }
     supabase.auth.getSession().then(({ data }) => load(data.session));
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") setTimeout(() => load(session), 0);
+      clearTimeout(timer);
+      if (event === "SIGNED_OUT") { void load(null); return; }
+      if (event === "USER_UPDATED") currentUser = null;
+      if (event === "SIGNED_IN" || event === "USER_UPDATED" || event === "TOKEN_REFRESHED") timer = setTimeout(() => { if (alive) void load(session); }, 0);
     });
-    return () => { alive = false; sub.subscription.unsubscribe(); };
+    return () => { alive = false; generation++; clearTimeout(timer); sub.subscription.unsubscribe(); };
   }, []);
 
   return <Ctx.Provider value={state}>{children}</Ctx.Provider>;

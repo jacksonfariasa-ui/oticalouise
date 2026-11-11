@@ -13,6 +13,8 @@ export const Route = createFileRoute("/_authenticated/otica-zap")({
       { name: "description", content: "Envio e acompanhamento de mensagens de WhatsApp para clientes da ótica." },
       { property: "og:title", content: "Ótica Zap — Ótica Louise" },
       { property: "og:description", content: "Envio e acompanhamento de mensagens de WhatsApp para clientes da ótica." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: OticaZap,

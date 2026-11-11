@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import logoPadrao from "@/assets/otica-louise.jpg.asset.json";
@@ -25,7 +25,7 @@ export const empresaQuery = {
 export function useEmpresa() {
   const { data } = useQuery(empresaQuery);
   const e = data ?? EMPRESA_PADRAO;
-  return { ...e, logo: e.logo_url || logoPadrao.url };
+  return useMemo(() => ({ ...e, logo: e.logo_url || logoPadrao.url }), [e]);
 }
 
 const VARS = ["--primary", "--ring", "--chart-1", "--sidebar", "--sidebar-accent", "--sidebar-primary", "--accent", "--secondary"];
@@ -57,11 +57,13 @@ export function reduzirImagem(file: File, max = 256): Promise<string> {
       const k = Math.min(1, max / Math.max(img.width, img.height));
       const cv = document.createElement("canvas");
       cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
-      cv.getContext("2d")!.drawImage(img, 0, 0, cv.width, cv.height);
+      const context = cv.getContext("2d");
       URL.revokeObjectURL(img.src);
+      if (!context) { reject(new Error("Não foi possível processar a imagem")); return; }
+      context.drawImage(img, 0, 0, cv.width, cv.height);
       resolve(cv.toDataURL("image/png"));
     };
-    img.onerror = () => reject(new Error("Imagem inválida"));
+    img.onerror = () => { URL.revokeObjectURL(img.src); reject(new Error("Imagem inválida")); };
     img.src = URL.createObjectURL(file);
   });
 }
