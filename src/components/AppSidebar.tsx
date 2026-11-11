@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, LogOut } from "lucide-react";
@@ -27,6 +27,7 @@ export function Item({ to, active, children, onNav, className }: { to: string; a
   if (to === "relatorio") return <Link to="/filiais/relatorio" className={cls} onClick={onNav}>{children}</Link>;
   if (FILIAIS.includes(to)) return <Link to="/filiais/$id" params={{ id: to }} className={cls} onClick={onNav}>{children}</Link>;
   if (to === "produtos") return <Link to="/produtos" className={cls} onClick={onNav}>{children}</Link>;
+  if (to === "notas-fiscais") return <Link to="/notas-fiscais" className={cls} onClick={onNav}>{children}</Link>;
   if (to === "administracao") return <Link to="/usuarios" className={cls} onClick={onNav}>{children}</Link>;
   if (LENTES.includes(to)) return <Link to="/lentes/$tipo" params={{ tipo: to }} className={cls} onClick={onNav}>{children}</Link>;
   return <Link to="/modulo/$slug" params={{ slug: to }} className={cls} onClick={onNav}>{children}</Link>;
@@ -42,12 +43,12 @@ export function AppSidebar({ onNav }: { onNav: () => void }) {
   const isActive = (slug: string) =>
     slug === "" ? pathname === "/"
       : slug === "administracao" ? pathname === "/usuarios"
-      : ["realizar-venda", "otica-zap", "clientes", "produtos", "promocoes", "filiais"].includes(slug) ? pathname === `/${slug}`
+      : ["realizar-venda", "otica-zap", "clientes", "produtos", "promocoes", "filiais", "notas-fiscais"].includes(slug) ? pathname === `/${slug}`
       : slug === "relatorio" || FILIAIS.includes(slug) ? pathname === `/filiais/${slug}`
       : LENTES.includes(slug) ? pathname === `/lentes/${slug}` : pathname === `/modulo/${slug}`;
 
-  const items = NAV.map((n) => (n.children ? { ...n, children: n.children.filter((c) => canAccess(role, c.slug, acessos)) } : n))
-    .filter((n) => (n.children ? n.children.length > 0 : canAccess(role, n.slug, acessos)));
+  const items = useMemo(() => NAV.map((n) => (n.children ? { ...n, children: n.children.filter((c) => canAccess(role, c.slug, acessos)) } : n))
+    .filter((n) => (n.children ? n.children.length > 0 : canAccess(role, n.slug, acessos))), [role, acessos]);
 
   async function sair() {
     await qc.cancelQueries();

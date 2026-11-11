@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { usePersistedList } from "@/lib/persisted";
+import { savedListOptions } from "@/lib/saved-data";
+import { DataError, DataNotFound } from "@/components/RouteFeedback";
+import { TablePager } from "@/components/TablePager";
+import { useTablePage } from "@/hooks/use-table-page";
 import { useMemo, useState } from "react";
 import { FileText, Plus, Search, Trash2 } from "lucide-react";
 import { lerNfeXml, type Nfe } from "@/lib/nfe";
@@ -15,8 +19,13 @@ export const Route = createFileRoute("/_authenticated/produtos")({
       { name: "description", content: "Cadastro de armações, lentes e acessórios da ótica." },
       { property: "og:title", content: "Produtos — Ótica Louise" },
       { property: "og:description", content: "Cadastro de armações, lentes e acessórios da ótica." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
+  loader: async ({ context }) => { await context.queryClient.ensureQueryData(savedListOptions<Produto>("produtos", [])); },
+  errorComponent: DataError,
+  notFoundComponent: DataNotFound,
   component: Produtos,
 });
 
@@ -39,6 +48,7 @@ function Produtos() {
     const q = busca.toLowerCase();
     return lista.filter((p) => (cat === "Todas" || p.categoria === cat) && [p.nome, p.codigo, p.marca].some((v) => v.toLowerCase().includes(q)));
   }, [lista, busca, cat]);
+  const pagination = useTablePage(filtrados, `${busca}:${cat}`);
 
   const [nfe, setNfe] = useState<Nfe | null>(null);
   const [nfeCat, setNfeCat] = useState("Armação");
@@ -141,7 +151,7 @@ function Produtos() {
               <th className="py-2 pr-3">Código</th><th className="pr-3">Produto</th><th className="pr-3">Categoria</th><th className="pr-3">Marca</th><th className="pr-3 text-right">Preço</th><th className="pr-3 text-right">Estoque</th><th />
             </tr></thead>
             <tbody>
-              {filtrados.map((p) => (
+              {pagination.visible.map((p) => (
                 <tr key={p.id} className="border-b last:border-0">
                   <td className="py-2 pr-3 text-muted-foreground">{p.codigo}</td><td className="pr-3 font-medium">{p.nome}</td>
                   <td className="pr-3">{p.categoria}</td><td className="pr-3">{p.marca}</td><td className="pr-3 text-right">{brl(p.preco)}</td>
@@ -153,6 +163,7 @@ function Produtos() {
             </tbody>
           </table>
         </div>
+        <TablePager {...pagination} />
       </Card>
       <Dialog open={aberto} onOpenChange={setAberto}>
         <DialogContent>

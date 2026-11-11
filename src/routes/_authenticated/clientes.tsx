@@ -1,6 +1,11 @@
 import { registrarAtividade } from "@/lib/atividades";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { clientOptions } from "@/lib/client-data";
+import { DataError, DataNotFound } from "@/components/RouteFeedback";
+import { TablePager } from "@/components/TablePager";
+import { useTablePage } from "@/hooks/use-table-page";
 import { History, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -17,8 +22,13 @@ export const Route = createFileRoute("/_authenticated/clientes")({
       { name: "description", content: "Cadastro e consulta de clientes da ótica." },
       { property: "og:title", content: "Clientes — Ótica Louise" },
       { property: "og:description", content: "Cadastro e consulta de clientes da ótica." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
+  loader: async ({ context }) => { await context.queryClient.ensureQueryData(clientOptions); },
+  errorComponent: DataError,
+  notFoundComponent: DataNotFound,
   component: Clientes,
 });
 
@@ -40,19 +50,20 @@ const CAMPOS: [keyof typeof VAZIO, string, string][] = [
 const fmt = (d?: string) => (d ? new Date(d.length === 10 ? d + "T12:00:00" : d).toLocaleDateString("pt-BR") : "—");
 
 function Clientes() {
-  const [lista, setLista] = useState<Cliente[]>([]);
+  const qc = useQueryClient();
+  const { data: lista } = useSuspenseQuery(clientOptions);
   const [busca, setBusca] = useState("");
   const [aberto, setAberto] = useState(false);
   const [form, setForm] = useState(VAZIO);
   const [historico, setHistorico] = useState<{ cliente: Cliente; vendas: Venda[] } | null>(null);
 
-  const carregar = () => supabase.from("clientes").select("*").order("nome").then(({ data }) => setLista(data ?? []));
-  useEffect(() => { void carregar(); }, []);
+  const carregar = () => qc.invalidateQueries({ queryKey: clientOptions.queryKey });
 
   const filtrados = useMemo(() => {
     const q = busca.toLowerCase();
     return lista.filter((c) => [c.nome, c.cpf, c.telefone, c.email].some((v) => v.toLowerCase().includes(q)));
   }, [lista, busca]);
+  const pagination = useTablePage(filtrados, busca);
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +104,7 @@ function Clientes() {
               <th className="py-2 pr-3">Nome</th><th className="pr-3">CPF</th><th className="pr-3">Telefone</th><th className="pr-3">E-mail</th><th className="pr-3">Cidade</th><th />
             </tr></thead>
             <tbody>
-              {filtrados.map((c) => (
+              {pagination.visible.map((c) => (
                 <tr key={c.id} className="border-b last:border-0">
                   <td className="py-2 pr-3 font-medium">{c.nome}</td><td className="pr-3">{c.cpf}</td><td className="pr-3">{c.telefone}</td>
                   <td className="pr-3">{c.email}</td><td className="pr-3">{c.cidade}</td>
@@ -107,6 +118,7 @@ function Clientes() {
             </tbody>
           </table>
         </div>
+        <TablePager {...pagination} />
       </Card>
 
       <Dialog open={aberto} onOpenChange={setAberto}>

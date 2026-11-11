@@ -1,20 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { createFileRoute } from "@tanstack/react-router";
+import { Suspense, useMemo, useState } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { CHAVE_ATIVIDADES, type Atividade } from "@/lib/atividades";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import {
-  ArrowDownCircle, ArrowUpCircle, Split, ShieldAlert, Cake, PhoneCall, FileWarning, Truck, CalendarClock, PackageMinus,
-  type LucideIcon,
-} from "lucide-react";
+import { savedListOptions } from "@/lib/saved-data";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Item } from "@/components/AppSidebar";
 import { NAV } from "@/lib/nav";
 import { useAuth } from "@/lib/auth";
 import { canAccess } from "@/lib/permissions";
-import { useEmpresa } from "@/lib/empresa";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -23,65 +17,24 @@ export const Route = createFileRoute("/_authenticated/")({
       { name: "description", content: "Atalhos para as áreas do sistema da ótica." },
       { property: "og:title", content: "Início — Ótica Louise" },
       { property: "og:description", content: "Atalhos para as áreas do sistema da ótica." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Dashboard,
 });
 
-const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const DAILY = Array.from({ length: 17 }, (_, i) => ({
-  dia: `${String(i + 1).padStart(2, "0")}/10`,
-  faturamento: 0,
-  despesas: 0,
-}));
-
-type Widget = {
-  title: string; icon: LucideIcon; tone: "primary" | "destructive" | "warning" | "success";
-  value: string; sub?: string; stats?: [string, number][]; action?: string; rows: string[];
-};
-
-const WIDGETS: Widget[] = [
-  { title: "Contas a Pagar em Aberto", icon: ArrowDownCircle, tone: "destructive", value: brl(0),
-    rows: [] },
-  { title: "Contas Rateadas em Aberto", icon: Split, tone: "warning", value: brl(0),
-    rows: [] },
-  { title: "Contas a Receber em Aberto", icon: ArrowUpCircle, tone: "success", value: brl(0),
-    rows: [] },
-  { title: "Remover Clientes do SPC / Pagar Contas", icon: ShieldAlert, tone: "destructive", value: "0 clientes", action: "Ver clientes",
-    rows: [] },
-  { title: "Aniversariantes da Semana", icon: Cake, tone: "primary", value: "0 clientes",
-    rows: [] },
-  { title: "Pós-Vendas do Dia", icon: PhoneCall, tone: "primary", value: "0 contatos", stats: [["No prazo", 0], ["Último dia", 0], ["Atrasados", 0]], action: "Ver Pós-Vendas",
-    rows: [] },
-  { title: "Receitas Vencidas", icon: FileWarning, tone: "warning", value: "0 receitas",
-    rows: [] },
-  { title: "Ordens de Serviço a Entregar", icon: Truck, tone: "primary", value: "0 O.S.", stats: [["Hoje", 0], ["Esta semana", 0], ["Atrasadas", 0]],
-    rows: [] },
-  { title: "Validade de Produtos", icon: CalendarClock, tone: "warning", value: "0 itens", stats: [["Vencidos", 0], ["A vencer", 0]], action: "Listar Produtos",
-    rows: [] },
-  { title: "Produtos Abaixo do Estoque Mínimo", icon: PackageMinus, tone: "destructive", value: "0", action: "Listar Produtos",
-    rows: [] },
-];
-
-const TONE = {
-  primary: "bg-primary/10 text-primary",
-  destructive: "bg-destructive/10 text-destructive",
-  warning: "bg-warning/15 text-warning",
-  success: "bg-success/10 text-success",
-};
-
 function Dashboard() {
-  const { role } = useAuth();
   return <SellerHome />;
 }
 
 function SellerHome() {
   const { nome, acessos, role } = useAuth();
-  const buttons = NAV.flatMap((n) =>
+  const buttons = useMemo(() => NAV.flatMap((n) =>
     n.children
       ? n.children.filter((c) => canAccess(role, c.slug, acessos)).map((c) => ({ label: c.label, slug: c.slug, icon: n.icon }))
       : n.slug && canAccess(role, n.slug, acessos) ? [{ label: n.label, slug: n.slug, icon: n.icon }] : [],
-  );
+  ), [role, acessos]);
   return (
     <div className="space-y-6">
       <div><h1 className="text-2xl font-bold">Olá, {nome}</h1><p className="text-sm text-muted-foreground">Escolha o que deseja fazer</p></div>
@@ -97,21 +50,14 @@ function SellerHome() {
           );
         })}
       </div>
-      {(role === "admin" || role === "gerente") && <Atividades />}
+      {(role === "admin" || role === "gerente") && <Suspense fallback={<p className="text-sm text-muted-foreground">Carregando…</p>}><Atividades /></Suspense>}
     </div>
   );
 }
 
 function Atividades() {
-  const [lista, setLista] = useState<Atividade[]>([]);
+  const { data: lista } = useSuspenseQuery({ ...savedListOptions<Atividade>(CHAVE_ATIVIDADES, []), staleTime: 15_000, refetchInterval: 15_000, refetchIntervalInBackground: false });
   const [todas, setTodas] = useState(false);
-  useEffect(() => {
-    const carregar = () => supabase.from("dados_salvos").select("dados").eq("chave", CHAVE_ATIVIDADES).maybeSingle()
-      .then(({ data }) => setLista(data && Array.isArray(data.dados) ? (data.dados as Atividade[]) : []));
-    void carregar();
-    const t = setInterval(carregar, 15000);
-    return () => clearInterval(t);
-  }, []);
   const vis = todas ? lista : lista.slice(0, 8);
   return (
     <Card className="p-5">

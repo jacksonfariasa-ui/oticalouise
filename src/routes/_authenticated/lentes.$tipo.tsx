@@ -1,13 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { usePersistedList } from "@/lib/persisted";
+import { savedListOptions } from "@/lib/saved-data";
+import { DataError, DataNotFound } from "@/components/RouteFeedback";
+import { TablePager } from "@/components/TablePager";
+import { useTablePage } from "@/hooks/use-table-page";
 import { useMemo, useRef, useState } from "react";
 import { Download, FileUp, Plus, Search, Trash2, Upload } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ACCEPT, imagemDataUrl, isImagem, readTableFile } from "@/lib/import-table";
-import { lerImagemLentes } from "@/lib/lentes-ocr.functions";
 import { VARILUX } from "@/lib/lentes-varilux";
 
 const TIPOS: Record<string, string> = {
@@ -21,8 +23,11 @@ export const Route = createFileRoute("/_authenticated/lentes/$tipo")({
   head: ({ params }) => {
     const t = `${TIPOS[params.tipo] ?? "Tabelas de Lentes"} — Ótica Louise`;
     const d = "Tabela de preços de lentes com importação de planilhas e documentos.";
-    return { meta: [{ title: t }, { name: "description", content: d }, { property: "og:title", content: t }, { property: "og:description", content: d }] };
+    return { meta: [{ title: t }, { name: "description", content: d }, { property: "og:title", content: t }, { property: "og:description", content: d }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] };
   },
+  loader: async ({ context, params }) => { await context.queryClient.ensureQueryData(savedListOptions<Lente>(`lentes:${params.tipo}`, INICIAIS)); },
+  errorComponent: DataError,
+  notFoundComponent: DataNotFound,
   component: Lentes,
 });
 
@@ -39,11 +44,7 @@ const COLUNAS: { k: Campo; label: string; alias: string[] }[] = [
   { k: "preco", label: "Preço venda", alias: ["preco", "venda", "valor", "preco venda"] },
 ];
 
-let seq = 100;
-const L = (tipo: string, fornecedor: string, nome: string, material: string, indice: string, faixa: string, custo: number, preco: number): Lente =>
-  ({ id: seq++, tipo, fornecedor, nome, material, indice, faixa, custo, preco });
-
-const INICIAIS: Lente[] = VARILUX.map((l) => L("lentes-multifocais", l.fornecedor, l.nome, l.material, l.indice, l.faixa, l.custo, l.preco));
+const INICIAIS: Lente[] = VARILUX.map((l, index) => ({ ...l, id: 100 + index, tipo: "lentes-multifocais" }));
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
@@ -58,6 +59,8 @@ function Lentes() {
   const { tipo } = Route.useParams();
   const titulo = TIPOS[tipo] ?? "Tabelas de Lentes";
   const [lista, setLista] = usePersistedList<Lente>(`lentes:${tipo}`, INICIAIS);
+  const nextId = useRef(504);
+  const allocateId = () => { nextId.current = Math.max(nextId.current, ...lista.map((lens) => lens.id + 1)); return nextId.current++; };
   const [busca, setBusca] = useState("");
   const [novo, setNovo] = useState(false);
   const [form, setForm] = useState(VAZIO);
@@ -71,6 +74,7 @@ function Lentes() {
     const q = norm(busca);
     return lista.filter((l) => l.tipo === tipo && [l.nome, l.fornecedor, l.material, l.faixa].some((v) => norm(v).includes(q)));
   }, [lista, tipo, busca]);
+  const pagination = useTablePage(itens, `${tipo}:${busca}`);
   const margem = itens.length ? itens.reduce((a, l) => a + (l.preco ? (l.preco - l.custo) / l.preco : 0), 0) / itens.length : 0;
 
   async function abrirArquivo(file?: File) {
@@ -78,7 +82,8 @@ function Lentes() {
     if (!file) return;
     try {
       setLendo(true);
-      const bruto = isImagem(file) ? (await lerImagemLentes({ data: { imagem: await imagemDataUrl(file) } })).linhas : await readTableFile(file);
+      const { imagemDataUrl, isImagem, readTableFile } = await import("@/lib/import-table");
+      const bruto = isImagem(file) ? (await (await import("@/lib/lentes-ocr.functions")).lerImagemLentes({ data: { imagem: await imagemDataUrl(file) } })).linhas : await readTableFile(file);
       let rows = bruto.filter((r) => r.some((c) => c?.trim()));
       if (isImagem(file) && rows.length < 2) throw new Error("Nenhuma lente foi encontrada na foto. Tente uma imagem mais nítida.");
       const reconhece = (r: string[]) => r.filter((h) => COLUNAS.some((c) => c.alias.some((a) => norm(h ?? "").includes(a)))).length;
@@ -100,7 +105,7 @@ function Lentes() {
     const novos = imp.linhas.slice(1).map((r) => {
       const o: Record<Campo, string> = { ...VAZIO };
       imp.mapa.forEach((k, i) => { if (k) o[k] = r[i] ?? ""; });
-      return { id: seq++, tipo, fornecedor: o.fornecedor, nome: o.nome, material: o.material, indice: o.indice, faixa: o.faixa, custo: num(o.custo), preco: num(o.preco) };
+      return { id: allocateId(), tipo, fornecedor: o.fornecedor, nome: o.nome, material: o.material, indice: o.indice, faixa: o.faixa, custo: num(o.custo), preco: num(o.preco) };
     }).filter((l) => l.nome);
     setLista((l) => [...novos, ...l]);
     setImp(null);
@@ -119,7 +124,8 @@ function Lentes() {
   function salvar(e: React.FormEvent) {
     e.preventDefault();
     if (!form.nome.trim()) return;
-    setLista((l) => [{ id: seq++, tipo, ...form, custo: num(form.custo), preco: num(form.preco) }, ...l]);
+    const id = allocateId();
+    setLista((l) => [{ id, tipo, ...form, custo: num(form.custo), preco: num(form.preco) }, ...l]);
     setForm(VAZIO);
     setNovo(false);
   }
@@ -168,7 +174,7 @@ function Lentes() {
         <FileUp className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
         <p className="text-sm font-medium">Arraste sua tabela aqui ou clique para escolher</p>
         <p className="text-xs text-muted-foreground">{lendo ? "Lendo a foto da tabela, aguarde…" : "Aceita foto (JPG/PNG),"} PDF, PowerPoint (.pptx), Excel (.xlsx), Word (.docx), CSV, TXT, TSV e HTML. A primeira linha da tabela deve conter os títulos das colunas.</p>
-        <input ref={fileRef} type="file" accept={ACCEPT} className="hidden" onChange={(e) => abrirArquivo(e.target.files?.[0])} />
+        <input ref={fileRef} type="file" accept=".xlsx,.csv,.txt,.tsv,.docx,.pptx,.pdf,.html,.htm,.xml,.jpg,.jpeg,.png,.webp" className="hidden" onChange={(e) => abrirArquivo(e.target.files?.[0])} />
       </div>
       {erro && <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{erro}</p>}
 
@@ -183,7 +189,7 @@ function Lentes() {
               {COLUNAS.map((c) => <th key={c.k} className={`py-2 pr-3 ${c.k === "custo" || c.k === "preco" ? "text-right" : ""}`}>{c.label}</th>)}<th />
             </tr></thead>
             <tbody>
-              {itens.map((l) => (
+              {pagination.visible.map((l) => (
                 <tr key={l.id} className="border-b last:border-0">
                   {COLUNAS.map((c) => {
                     const dinheiro = c.k === "custo" || c.k === "preco";
@@ -210,6 +216,7 @@ function Lentes() {
             </tbody>
           </table>
         </div>
+        <TablePager {...pagination} />
       </Card>
 
       <Dialog open={novo} onOpenChange={setNovo}>

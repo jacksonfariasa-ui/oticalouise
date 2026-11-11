@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, redirect, useLocation, Link } from "@tanstack/
 import { useState } from "react";
 import { Menu, ShieldX, Clock, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { FiliaisSync } from "@/components/FiliaisConfig";
+import { FiliaisSync } from "@/components/FiliaisSync";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/lib/auth";
 import { canAccess, roleLabel, slugFromPath } from "@/lib/permissions";
