@@ -62,7 +62,7 @@ describe("Bounded data reads and rendering", () => {
   });
   it("excludes unrelated catalogs from report reads", async () => {
     await reportOptions.queryFn?.({} as never);
-    expect(mocks.inKeys).toHaveBeenCalledWith("chave", ["modulo:Vendas", "modulo:Fluxo de Caixa", "modulo:Contas a pagar", "modulo:Contas a receber", "modulo:Ordens de Serviço (O.S.)", "atividades"]);
+    expect(mocks.inKeys).toHaveBeenCalledWith("chave", ["modulo:Vendas", "modulo:Fluxo de caixa", "modulo:Contas a receber", "modulo:Contas a pagar", "modulo:Ordens de Serviço (O.S.)", "atividades"]);
   });
   it("keeps every row reachable and resets page when filtering", () => {
     const items = Array.from({ length: 404 }, (_, id) => id);

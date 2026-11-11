@@ -104,8 +104,9 @@ async function readPdf(buf: ArrayBuffer): Promise<string[][]> {
   const pdfjs = await import("pdfjs-dist");
   const worker = await import("pdfjs-dist/build/pdf.worker.min.mjs?url");
   pdfjs.GlobalWorkerOptions.workerSrc = worker.default;
-  const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf) }).promise;
+  const task = pdfjs.getDocument({ data: new Uint8Array(buf) });
   try {
+  const pdf = await task.promise;
   const out: string[] = [];
   for (let n = 1; n <= pdf.numPages; n++) {
     const page = await pdf.getPage(n);
@@ -132,7 +133,7 @@ async function readPdf(buf: ArrayBuffer): Promise<string[][]> {
   const lines = out.filter((l) => l.trim());
   return lines.map((l) => l.split("\t").map((c) => c.trim()));
   } finally {
-    await pdf.destroy();
+    await task.destroy();
   }
 }
 

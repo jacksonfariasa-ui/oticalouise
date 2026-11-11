@@ -44,11 +44,7 @@ const COLUNAS: { k: Campo; label: string; alias: string[] }[] = [
   { k: "preco", label: "Preço venda", alias: ["preco", "venda", "valor", "preco venda"] },
 ];
 
-let seq = 100;
-const L = (tipo: string, fornecedor: string, nome: string, material: string, indice: string, faixa: string, custo: number, preco: number): Lente =>
-  ({ id: seq++, tipo, fornecedor, nome, material, indice, faixa, custo, preco });
-
-const INICIAIS: Lente[] = VARILUX.map((l) => L("lentes-multifocais", l.fornecedor, l.nome, l.material, l.indice, l.faixa, l.custo, l.preco));
+const INICIAIS: Lente[] = VARILUX.map((l, index) => ({ ...l, id: 100 + index, tipo: "lentes-multifocais" }));
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
@@ -63,6 +59,8 @@ function Lentes() {
   const { tipo } = Route.useParams();
   const titulo = TIPOS[tipo] ?? "Tabelas de Lentes";
   const [lista, setLista] = usePersistedList<Lente>(`lentes:${tipo}`, INICIAIS);
+  const nextId = useRef(504);
+  const allocateId = () => { nextId.current = Math.max(nextId.current, ...lista.map((lens) => lens.id + 1)); return nextId.current++; };
   const [busca, setBusca] = useState("");
   const [novo, setNovo] = useState(false);
   const [form, setForm] = useState(VAZIO);
@@ -107,7 +105,7 @@ function Lentes() {
     const novos = imp.linhas.slice(1).map((r) => {
       const o: Record<Campo, string> = { ...VAZIO };
       imp.mapa.forEach((k, i) => { if (k) o[k] = r[i] ?? ""; });
-      return { id: seq++, tipo, fornecedor: o.fornecedor, nome: o.nome, material: o.material, indice: o.indice, faixa: o.faixa, custo: num(o.custo), preco: num(o.preco) };
+      return { id: allocateId(), tipo, fornecedor: o.fornecedor, nome: o.nome, material: o.material, indice: o.indice, faixa: o.faixa, custo: num(o.custo), preco: num(o.preco) };
     }).filter((l) => l.nome);
     setLista((l) => [...novos, ...l]);
     setImp(null);
@@ -126,7 +124,8 @@ function Lentes() {
   function salvar(e: React.FormEvent) {
     e.preventDefault();
     if (!form.nome.trim()) return;
-    setLista((l) => [{ id: seq++, tipo, ...form, custo: num(form.custo), preco: num(form.preco) }, ...l]);
+    const id = allocateId();
+    setLista((l) => [{ id, tipo, ...form, custo: num(form.custo), preco: num(form.preco) }, ...l]);
     setForm(VAZIO);
     setNovo(false);
   }
