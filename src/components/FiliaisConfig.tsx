@@ -1,6 +1,6 @@
 import { registrarAtividade } from "@/lib/atividades";
 import { useEffect, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Save, Store } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { updateFilial, useFiliais, type Filial } from "@/lib/filiais";
@@ -12,20 +12,6 @@ const CAMPOS: { k: keyof Info; label: string; wide?: boolean }[] = [
   { k: "endereco", label: "Endereço", wide: true }, { k: "horario", label: "Horário de funcionamento", wide: true },
 ];
 const STATUS: Filial["status"][] = ["Ativa", "Em reforma", "Inativa"];
-
-const filiaisQuery = {
-  queryKey: ["filiais_info"],
-  queryFn: async () => (await supabase.from("filiais_info").select("*")).data ?? [],
-};
-
-/** Applies saved branch details over the built-in branch data. */
-export function FiliaisSync() {
-  const { data } = useQuery(filiaisQuery);
-  useEffect(() => {
-    (data ?? []).forEach(({ updated_at: _u, ...r }) => updateFilial(r.id, (f) => ({ ...f, ...r, status: r.status as Filial["status"] })));
-  }, [data]);
-  return null;
-}
 
 export function FiliaisConfig() {
   const qc = useQueryClient();

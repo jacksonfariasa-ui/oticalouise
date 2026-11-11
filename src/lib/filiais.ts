@@ -63,6 +63,8 @@ let vendasSistema: Record<string, unknown>[] = [];
 let osSistema: Record<string, unknown>[] = [];
 let carregado = false;
 let salvarTimer: ReturnType<typeof setTimeout> | undefined;
+let loadingRequest: Promise<void> | null = null;
+let lastLoaded = 0;
 
 const mesKey = (d: Date) => d.toISOString().slice(0, 7);
 const ultimosMeses = () => Array.from({ length: 6 }, (_, i) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - 5 + i); return d; });
@@ -114,6 +116,13 @@ function salvarManual() {
 
 /** Loads saved branch entries, system sales/O.S. and the team, then recomputes. */
 export async function carregarFiliais() {
+  if (loadingRequest) return loadingRequest;
+  if (Date.now() - lastLoaded < 15_000) return;
+  loadingRequest = loadFiliais().finally(() => { loadingRequest = null; });
+  return loadingRequest;
+}
+
+async function loadFiliais() {
   const [{ data }, { data: eq }] = await Promise.all([
     supabase.from("dados_salvos").select("chave, dados").in("chave", [CHAVE_MANUAL, `modulo:${findLabel("vendas")}`, `modulo:${findLabel("ordens-de-servico")}`]),
     supabase.rpc("equipe_filiais"),
@@ -128,8 +137,25 @@ export async function carregarFiliais() {
     return recalcular({ ...u, meta: m.meta ?? u.meta, vendasLista: m.vendasLista ?? u.vendasLista, osLista: m.osLista ?? u.osLista, estoqueLista: m.estoqueLista ?? u.estoqueLista });
   });
   carregado = true;
+  lastLoaded = Date.now();
   emit();
 }
+
+/** Remote metadata hydration is read-only and emits once, never saving manual data. */
+export function applyFiliaisMetadata(rows: (Partial<Filial> & { id: string })[]) {
+  let changed = false;
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  const next = state.map((unit) => {
+    const row = byId.get(unit.id);
+    if (!row || Object.entries(row).every(([key, value]) => unit[key as keyof Unidade] === value)) return unit;
+    changed = true;
+    return { ...unit, ...row };
+  });
+  if (changed) { state = next; emit(); }
+}
+
+const subscribe = (cb: () => void) => { subs.add(cb); return () => { subs.delete(cb); }; };
+const snapshot = () => state;
 
 export function updateFilial(id: string, fn: (f: Unidade) => Unidade) {
   state = state.map((f) => (f.id === id ? recalcular(fn(f)) : f));
@@ -140,9 +166,9 @@ export function updateFilial(id: string, fn: (f: Unidade) => Unidade) {
 export function useFiliais(): Unidade[] {
   useEffect(() => { void carregarFiliais(); }, []);
   return useSyncExternalStore(
-    (cb) => { subs.add(cb); return () => subs.delete(cb); },
-    () => state,
-    () => state,
+    subscribe,
+    snapshot,
+    snapshot,
   );
 }
 

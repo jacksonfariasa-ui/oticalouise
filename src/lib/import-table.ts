@@ -105,6 +105,7 @@ async function readPdf(buf: ArrayBuffer): Promise<string[][]> {
   const worker = await import("pdfjs-dist/build/pdf.worker.min.mjs?url");
   pdfjs.GlobalWorkerOptions.workerSrc = worker.default;
   const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf) }).promise;
+  try {
   const out: string[] = [];
   for (let n = 1; n <= pdf.numPages; n++) {
     const page = await pdf.getPage(n);
@@ -113,7 +114,9 @@ async function readPdf(buf: ArrayBuffer): Promise<string[][]> {
     for (const it of items) {
       if (!it.str?.trim()) continue;
       const y = Math.round((it.transform[5] ?? 0) / 3) * 3;
-      (rows.get(y) ?? rows.set(y, []).get(y)!).push({ x: it.transform[4] ?? 0, w: it.width, s: it.str.trim() });
+      let row = rows.get(y);
+      if (!row) { row = []; rows.set(y, row); }
+      row.push({ x: it.transform[4] ?? 0, w: it.width, s: it.str.trim() });
     }
     [...rows.entries()].sort((a, b) => b[0] - a[0]).forEach(([, cells]) => {
       cells.sort((a, b) => a.x - b.x);
@@ -124,9 +127,13 @@ async function readPdf(buf: ArrayBuffer): Promise<string[][]> {
       }
       out.push(line);
     });
+    page.cleanup();
   }
   const lines = out.filter((l) => l.trim());
   return lines.map((l) => l.split("\t").map((c) => c.trim()));
+  } finally {
+    await pdf.destroy();
+  }
 }
 
 export const ACCEPT = ".xlsx,.csv,.txt,.tsv,.docx,.pptx,.pdf,.html,.htm,.xml,.jpg,.jpeg,.png,.webp";
@@ -136,11 +143,17 @@ export const isImagem = (f: File) => f.type.startsWith("image/") || /\.(jpe?g|pn
 // Reduz a imagem e devolve data URL JPEG.
 export async function imagemDataUrl(file: File, max = 2000): Promise<string> {
   const bmp = await createImageBitmap(file);
+  try {
   const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
   const c = document.createElement("canvas");
   c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
-  c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
+  const context = c.getContext("2d");
+  if (!context) throw new Error("Não foi possível processar a imagem.");
+  context.drawImage(bmp, 0, 0, c.width, c.height);
   return c.toDataURL("image/jpeg", 0.85);
+  } finally {
+    bmp.close();
+  }
 }
 
 export async function readTableFile(file: File): Promise<string[][]> {
