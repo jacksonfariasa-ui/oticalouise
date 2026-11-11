@@ -2,6 +2,7 @@ import { useCallback, type Dispatch, type SetStateAction } from "react";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { savedListKey, savedListOptions, saveList } from "@/lib/saved-data";
 import { descreverMudanca, nomeSecao, registrarAtividade } from "@/lib/atividades";
+import { toast } from "sonner";
 
 /** Lista salva no banco (tabela dados_salvos) com a mesma API do useState. */
 export function usePersistedList<T>(chave: string, inicial: T[] | (() => T[])): [T[], Dispatch<SetStateAction<T[]>>, boolean] {
@@ -20,6 +21,7 @@ export function usePersistedList<T>(chave: string, inicial: T[] | (() => T[])): 
       void qc.invalidateQueries({ queryKey: ["catalogo-venda"] });
     }).catch((error) => {
       console.error("Erro ao salvar", chave, error);
+      toast.error("Não foi possível salvar a alteração. Tente novamente.");
       if (qc.getQueryData(key) === after) qc.setQueryData(key, before);
     });
   }, [chave, lista, qc]);
