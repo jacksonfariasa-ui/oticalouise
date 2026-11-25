@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { InstallApp } from "@/components/InstallApp";
 import { useEmpresa } from "@/lib/empresa";
 
-const FILIAIS = ["matriz", "rorainopolis", "pintolandia"];
+const FILIAIS = ["matriz", "rorainopolis", "pintolandia", "estrela-dalva"];
 const LENTES = ["lentes-monofocais", "lentes-multifocais", "lentes-de-contato", "tratamentos"];
 
 export function Item({ to, active, children, onNav, className }: { to: string; active: boolean; children: React.ReactNode; onNav: () => void; className?: string }) {

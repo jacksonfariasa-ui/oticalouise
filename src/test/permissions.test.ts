@@ -10,6 +10,7 @@ describe("permissões por perfil", () => {
   it("técnico acessa ordens de serviço", () => expect(canAccess("tecnico", "ordens-de-servico")).toBe(true));
   it("técnico não acessa vendas", () => expect(canAccess("tecnico", "vendas")).toBe(false));
   it("vendedor acessa a própria filial", () => expect(canAccess("vendedor", "pintolandia")).toBe(true));
+  it("vendedor acessa a filial Estrela Dalva", () => expect(canAccess("vendedor", "estrela-dalva")).toBe(true));
   it("vendedor não acessa o relatório final das filiais", () => expect(canAccess("vendedor", "relatorio")).toBe(false));
   it("vendedor não acessa a visão geral das filiais", () => expect(canAccess("vendedor", "filiais")).toBe(false));
   it("sem perfil não acessa nada", () => expect(canAccess(null, "")).toBe(false));

@@ -9,7 +9,7 @@ import { useFiliais, updateFilial, brl, pctMeta } from "@/lib/filiais";
 import { useAuth } from "@/lib/auth";
 import { roleLabel } from "@/lib/permissions";
 
-const NOMES: Record<string, string> = { matriz: "Matriz", rorainopolis: "Filial Rorainópolis", pintolandia: "Filial Pintolândia" };
+const NOMES: Record<string, string> = { matriz: "Matriz", rorainopolis: "Filial Rorainópolis", pintolandia: "Filial Pintolândia", "estrela-dalva": "Filial Estrela Dalva" };
 
 export const Route = createFileRoute("/_authenticated/filiais_/$id")({
   beforeLoad: ({ params }) => { if (!NOMES[params.id]) throw notFound(); },

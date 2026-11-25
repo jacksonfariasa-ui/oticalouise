@@ -35,6 +35,13 @@ const BASE: Filial[] = [
     osAbertas: 0, estoque: 0, clientes: 0, mensal: [0, 0, 0, 0, 0, 0],
     equipe: [],
   },
+  {
+    id: "estrela-dalva", nome: "Filial Estrela Dalva", tipo: "Filial", status: "Ativa", cnpj: "",
+    endereco: "", cidade: "Boa Vista - RR", telefone: "", email: "estreladalva@oticalouise.com.br",
+    horario: "Seg a Sex 8h–18h · Sáb 8h–13h", gerente: "", faturamento: 0, meta: 0, vendas: 0,
+    osAbertas: 0, estoque: 0, clientes: 0, mensal: [0, 0, 0, 0, 0, 0],
+    equipe: [],
+  },
 ];
 
 export const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
